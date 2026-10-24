@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.0.0';
-import { PageManager } from './page-manager.js?v=3.0.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.0.0';
-import { ZoomController } from './zoom-controller.js?v=3.0.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.0.0';
+import { AudioFX } from './audio-fx.js?v=3.1.0';
+import { PageManager } from './page-manager.js?v=3.1.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.1.0';
+import { ZoomController } from './zoom-controller.js?v=3.1.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.1.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -197,16 +197,26 @@ class LuminaFlipApp {
     // 8. Filmstrip Drawer (Cajón de miniaturas inferior)
     const filmstripToggle = document.getElementById('btn-toggle-filmstrip');
     const filmstripDrawer = document.getElementById('bottom-filmstrip-drawer');
-    filmstripToggle?.addEventListener('click', () => {
-      this.isFilmstripOpen = !this.isFilmstripOpen;
-      filmstripDrawer?.classList.toggle('open', this.isFilmstripOpen);
-      filmstripToggle?.classList.toggle('active', this.isFilmstripOpen);
+    const btnCloseFilmstrip = document.getElementById('btn-close-filmstrip');
+
+    filmstripToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleFilmstrip();
     });
 
-    document.getElementById('btn-close-filmstrip')?.addEventListener('click', () => {
-      this.isFilmstripOpen = false;
-      filmstripDrawer?.classList.remove('open');
-      filmstripToggle?.classList.remove('active');
+    btnCloseFilmstrip?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.closeFilmstrip();
+    });
+
+    // Cerrar cajón de miniaturas al hacer clic fuera del mismo
+    document.addEventListener('click', (e) => {
+      if (this.isFilmstripOpen) {
+        if (!filmstripDrawer?.contains(e.target) && !filmstripToggle?.contains(e.target)) {
+          this.closeFilmstrip();
+        }
+      }
     });
 
     // 9. Modal de Gestión de Páginas y Subida en Lote
@@ -467,15 +477,69 @@ class LuminaFlipApp {
     this._highlightActiveThumbnail(this.flipbook.getCurrentPage());
   }
 
+  openFilmstrip() {
+    this.isFilmstripOpen = true;
+    const filmstripDrawer = document.getElementById('bottom-filmstrip-drawer');
+    const filmstripToggle = document.getElementById('btn-toggle-filmstrip');
+    const bottomToolbar = document.querySelector('.floating-bottom-toolbar');
+
+    filmstripDrawer?.classList.add('open');
+    filmstripToggle?.classList.add('active');
+    bottomToolbar?.classList.add('filmstrip-active');
+
+    this._centerActiveThumbnailInTrack();
+  }
+
+  closeFilmstrip() {
+    this.isFilmstripOpen = false;
+    const filmstripDrawer = document.getElementById('bottom-filmstrip-drawer');
+    const filmstripToggle = document.getElementById('btn-toggle-filmstrip');
+    const bottomToolbar = document.querySelector('.floating-bottom-toolbar');
+
+    filmstripDrawer?.classList.remove('open');
+    filmstripToggle?.classList.remove('active');
+    bottomToolbar?.classList.remove('filmstrip-active');
+
+    // Restablecer cualquier desplazamiento residual del viewport
+    window.scrollTo(0, 0);
+    const viewport = document.getElementById('app-root');
+    if (viewport) viewport.scrollTop = 0;
+  }
+
+  toggleFilmstrip() {
+    if (this.isFilmstripOpen) {
+      this.closeFilmstrip();
+    } else {
+      this.openFilmstrip();
+    }
+  }
+
+  _centerActiveThumbnailInTrack() {
+    const track = document.getElementById('filmstrip-track');
+    const activeEl = track?.querySelector('.filmstrip-item.active');
+    if (track && activeEl) {
+      const scrollPos = activeEl.offsetLeft - (track.clientWidth / 2) + (activeEl.clientWidth / 2);
+      track.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    }
+  }
+
   _highlightActiveThumbnail(pageIndex) {
     const items = document.querySelectorAll('.filmstrip-item');
+    let activeItem = null;
     items.forEach(el => {
       const idx = parseInt(el.dataset.index, 10);
-      el.classList.toggle('active', idx === pageIndex);
-      if (idx === pageIndex) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
+      const isActive = (idx === pageIndex);
+      el.classList.toggle('active', isActive);
+      if (isActive) activeItem = el;
     });
+
+    // CRÍTICO: SOLO desplazar la cinta si el cajón de miniaturas está VISIBLEMENTE abierto.
+    // NUNCA usar scrollIntoView(), ya que causa que el navegador desplace
+    // verticalmente el viewport del contenedor o de la ventana, activando la vista previa
+    // forzada en cada paso de página.
+    if (this.isFilmstripOpen && activeItem) {
+      this._centerActiveThumbnailInTrack();
+    }
   }
 
   _setActiveViewBtn(activeId) {
@@ -590,6 +654,7 @@ class LuminaFlipApp {
           break;
 
         case 'Escape':
+          this.closeFilmstrip();
           document.getElementById('page-manager-modal')?.classList.add('hidden');
           document.getElementById('keyboard-help-modal')?.classList.add('hidden');
           break;

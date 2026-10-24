@@ -18,11 +18,11 @@
   <meta name="theme-color" content="#0a0b0e" />
 
   <!-- Hojas de Estilo Modulares con Cache-Busting -->
-  <link rel="stylesheet" href="css/main.css?v=3.0.0" />
-  <link rel="stylesheet" href="css/flipbook.css?v=3.0.0" />
-  <link rel="stylesheet" href="css/toolbar.css?v=3.0.0" />
-  <link rel="stylesheet" href="css/manager.css?v=3.0.0" />
-  <link rel="stylesheet" href="css/zoom.css?v=3.0.0" />
+  <link rel="stylesheet" href="css/main.css?v=3.1.0" />
+  <link rel="stylesheet" href="css/flipbook.css?v=3.1.0" />
+  <link rel="stylesheet" href="css/toolbar.css?v=3.1.0" />
+  <link rel="stylesheet" href="css/manager.css?v=3.1.0" />
+  <link rel="stylesheet" href="css/zoom.css?v=3.1.0" />
 
   <!-- Favicon SVG en Data URI -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
@@ -134,8 +134,14 @@
     <!-- Cajón Inferior de Miniaturas (Filmstrip Drawer) -->
     <aside class="filmstrip-drawer glass-panel" id="bottom-filmstrip-drawer" aria-label="Cinta de miniaturas">
       <div class="filmstrip-header">
-        <span>Vista previa rápida de páginas</span>
-        <button class="header-btn" id="btn-close-filmstrip" title="Ocultar miniaturas" style="padding:0.2rem 0.5rem; font-size:0.75rem">✕ Cerrar</button>
+        <div class="filmstrip-title-group">
+          <span class="filmstrip-title">Vista previa de páginas</span>
+          <span class="filmstrip-hint">(Haz clic en una miniatura para saltar)</span>
+        </div>
+        <button class="filmstrip-close-btn" id="btn-close-filmstrip" title="Cerrar vista previa (Esc)" aria-label="Cerrar vista previa">
+          <span>✕</span>
+          <span>Cerrar</span>
+        </button>
       </div>
       <div class="filmstrip-track" id="filmstrip-track">
         <!-- Miniaturas generadas dinámicamente -->
@@ -314,10 +320,10 @@
   </div>
 
   <!-- Librerías de Terceros Vendoreadas Localmente (Cero fallos de red) -->
-  <script src="vendor/page-flip.browser.js?v=3.0.0"></script>
-  <script src="vendor/pdf.min.js?v=3.0.0"></script>
+  <script src="vendor/page-flip.browser.js?v=3.1.0"></script>
+  <script src="vendor/pdf.min.js?v=3.1.0"></script>
 
   <!-- Script Modular Principal -->
-  <script type="module" src="js/app.js?v=3.0.0"></script>
+  <script type="module" src="js/app.js?v=3.1.0"></script>
 </body>
 </html>
