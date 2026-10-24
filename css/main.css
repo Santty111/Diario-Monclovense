@@ -1,0 +1,150 @@
+/* ==========================================================================
+   LuminaFlip - Core Design System & Global Styles
+   Estética de Alta Gama: Glassmorphism, Paleta Obsidian & Oro Antiguo,
+   Micro-animaciones aceleradas por hardware y tipografía moderna.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Paleta cromática refinada */
+  --bg-primary: #0a0b0e;
+  --bg-secondary: #12141a;
+  --bg-card: rgba(22, 26, 35, 0.75);
+  --bg-glass: rgba(18, 22, 31, 0.65);
+  --bg-glass-hover: rgba(28, 34, 48, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(212, 175, 55, 0.55);
+
+  /* Acentos de Oro Antiguo & Papiro Archival */
+  --gold-primary: #d4af37;
+  --gold-light: #f5d77f;
+  --gold-glow: rgba(212, 175, 55, 0.25);
+  --gold-gradient: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa8010 100%);
+
+  /* Textos y contraste */
+  --text-main: #f0f3f8;
+  --text-muted: #9ba3b4;
+  --text-dim: #656d7e;
+
+  /* Colores de estado */
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-accent: #6366f1;
+
+  /* Sombras y profundidad */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+  --shadow-book: 0 24px 60px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5);
+
+  /* Curvas de transición fluidas */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 160ms;
+  --duration-normal: 260ms;
+
+  /* Radio de bordes */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.02) 0%, transparent 40%);
+  color: var(--text-main);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Scrollbars estilizadas */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* Tipografía de Utilidad */
+.mono-font {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-gradient-gold {
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Clases de Visibilidad y Transición */
+.hidden {
+  display: none !important;
+}
+
+/* Botones Base */
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px var(--gold-primary);
+}
+
+/* Glassmorphism Panel Utility */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-md);
+}
+
+/* Modal Backdrop */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn var(--duration-normal) var(--ease-smooth);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}

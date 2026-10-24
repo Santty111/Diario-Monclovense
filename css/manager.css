@@ -1,0 +1,341 @@
+/* ==========================================================================
+   LuminaFlip - Page Manager, Batch Upload, Reordering & Compression UI
+   ========================================================================== */
+
+.manager-modal-card {
+  width: 95%;
+  max-width: 1050px;
+  max-height: 90vh;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+}
+
+.modal-header {
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.modal-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Zona de Carga Drag & Drop */
+.upload-dropzone {
+  border: 2px dashed rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.drag-active {
+  border-color: var(--gold-primary);
+  background: rgba(212, 175, 55, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--gold-glow);
+}
+
+.dropzone-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dropzone-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.dropzone-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.dropzone-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.tag-badge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
+/* Barra de progreso de procesamiento */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-glass);
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--gold-gradient);
+  transition: width 0.2s ease;
+}
+
+.progress-status {
+  font-size: 0.8rem;
+  color: var(--gold-light);
+}
+
+/* Opciones de Compresión en el Cliente */
+.compression-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-glass);
+  font-size: 0.85rem;
+}
+
+.compression-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.compression-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.compression-select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: #181d28;
+  border: 1px solid var(--border-glass);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+/* Barra de Herramientas de Reordenamiento y Filtro */
+.manager-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.manager-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tool-action-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tool-action-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tool-action-btn.danger:hover {
+  color: #ff6b6b;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Rejilla de Páginas Ordenables */
+.manager-pages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1.25rem;
+  min-height: 200px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* Tarjeta de Página Individual */
+.manager-page-card {
+  position: relative;
+  background: rgba(20, 24, 34, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.manager-page-card:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.manager-page-card.is-dragging {
+  opacity: 0.3;
+  transform: scale(0.95);
+}
+
+.manager-page-card.drag-hover {
+  border-color: var(--gold-primary);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.card-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #11141c;
+}
+
+.card-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.card-num-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gold-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.card-title {
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-main);
+}
+
+.card-savings {
+  font-size: 0.7rem;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-card-action {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-card-action:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+}
+
+.btn-card-action.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ff6b6b;
+}
+
+.btn-card-action:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* Pie del modal */
+.modal-footer {
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.85rem;
+  border-top: 1px solid var(--border-glass);
+}

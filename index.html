@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  
+  <!-- SEO y Metadatos -->
+  <title>LuminaFlip | Lector Interactivo de Libros y Documentos Escaneados</title>
+  <meta name="description" content="LuminaFlip es un visor interactivo de flipbook de alto rendimiento para libros y documentos escaneados. Animación 3D realista a 60 FPS, compresión en cliente, efectos de sonido y zoom de alta precisión." />
+  <meta name="keywords" content="flipbook, visor de libros, documentos escaneados, page flip, visor interactivo, lector pdf, animacion 3d de paginas" />
+  <meta name="author" content="LuminaFlip Senior Engineering" />
+  
+  <!-- Open Graph / Redes Sociales -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="LuminaFlip - Lector Interactivo Flipbook 3D" />
+  <meta property="og:description" content="Visualizador fluido de documentos y libros escaneados con física realista de paso de hoja, zoom panorámico y sonido procedural." />
+  <meta property="og:image" content="assets/sample/page-01-cover.jpg" />
+  <meta name="theme-color" content="#0a0b0e" />
+
+  <!-- Hojas de Estilo Modulares -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/flipbook.css" />
+  <link rel="stylesheet" href="css/toolbar.css" />
+  <link rel="stylesheet" href="css/manager.css" />
+  <link rel="stylesheet" href="css/zoom.css" />
+
+  <!-- Favicon SVG en Data URI -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+</head>
+<body>
+  <div class="app-viewport" id="app-root">
+
+    <!-- Encabezado Principal Glassmorphism -->
+    <header class="app-header glass-panel" role="banner">
+      <div class="brand-section">
+        <div class="brand-logo-icon" aria-hidden="true">L</div>
+        <div>
+          <h1 class="brand-title">Lumina<span class="text-gradient-gold">Flip</span></h1>
+        </div>
+        <span class="brand-tag">v2.5 Pro</span>
+      </div>
+
+      <div class="header-actions">
+        <!-- Selector de Modo de Vista (Auto, Doble Spread, Página Simple) -->
+        <div class="segmented-control" role="group" aria-label="Modo de vista">
+          <button class="segmented-btn active" id="btn-view-auto" title="Vista Adaptable Automática">Auto</button>
+          <button class="segmented-btn" id="btn-view-double" title="Vista de Doble Página (Spread)">Doble</button>
+          <button class="segmented-btn" id="btn-view-single" title="Vista de Página Simple">Simple</button>
+        </div>
+
+        <!-- Control de Audio con Slider Desplegable -->
+        <div class="audio-control-group">
+          <button class="header-btn" id="btn-toggle-mute" title="Silenciar / Activar sonido (M)" aria-label="Control de sonido">
+            <span class="icon">🔊</span>
+          </button>
+          <div class="volume-slider-popup glass-panel">
+            <span style="font-size:0.75rem; color:var(--text-muted)">Vol:</span>
+            <input type="range" class="volume-slider" id="audio-volume-slider" min="0" max="100" value="75" aria-label="Volumen de sonido" />
+          </div>
+        </div>
+
+        <!-- Pantalla Completa -->
+        <button class="header-btn" id="btn-toggle-fullscreen" title="Pantalla Completa (F)" aria-label="Pantalla completa">
+          <span>⛶</span>
+        </button>
+
+        <!-- Ayuda de Atajos de Teclado -->
+        <button class="header-btn" id="btn-open-help" title="Atajos de Teclado (?)" aria-label="Ayuda de teclado">
+          <span>?</span>
+        </button>
+
+        <!-- Botón de Gestión y Carga de Documentos -->
+        <button class="header-btn primary" id="btn-open-manager" title="Subir y gestionar páginas escaneadas">
+          <span>📁 Cargar Documentos</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Escenario Principal del Flipbook -->
+    <main class="flipbook-stage" id="flipbook-stage-wrapper" role="main">
+      
+      <!-- Flecha de Navegación Izquierda (Página Anterior) -->
+      <button class="nav-arrow-btn prev" id="btn-nav-prev" title="Página Anterior (←)" aria-label="Página anterior">
+        ‹
+      </button>
+
+      <!-- Contenedor del Libro 3D -->
+      <div class="flipbook-container" id="flipbook-stage-container">
+        <!-- El elemento del libro se genera dinámicamente con StPageFlip -->
+      </div>
+
+      <!-- Flecha de Navegación Derecha (Página Siguiente) -->
+      <button class="nav-arrow-btn next" id="btn-nav-next" title="Página Siguiente (→)" aria-label="Página siguiente">
+        ›
+      </button>
+
+      <!-- Indicador Flotante de Página -->
+      <div class="page-indicator-floating glass-panel" aria-live="polite">
+        <span class="badge-text" id="page-counter-badge">Cargando páginas...</span>
+      </div>
+    </main>
+
+    <!-- Barra Flotante Inferior de Herramientas Rápidas -->
+    <nav class="floating-bottom-toolbar glass-panel" aria-label="Herramientas del lector">
+      <!-- Selector de Salto Rápido a Página -->
+      <div class="page-jump-container">
+        <span>Ir a:</span>
+        <input type="number" id="jump-page-input" class="page-jump-input" min="1" max="1" value="1" aria-label="Número de página para saltar" />
+      </div>
+
+      <div class="toolbar-divider" aria-hidden="true"></div>
+
+      <!-- Botón de Zoom e Inspección de Alta Resolución -->
+      <button class="toolbar-btn" id="btn-toggle-zoom" title="Modo Inspección y Zoom (Z)">
+        <span>🔍</span>
+        <span class="label">Zoom HD</span>
+      </button>
+
+      <!-- Botón de Modo Presentación / Auto-Play -->
+      <button class="toolbar-btn" id="btn-toggle-autoplay" title="Paso automático de páginas">
+        <span>▶</span>
+        <span class="label">Auto-reproducir</span>
+      </button>
+
+      <div class="toolbar-divider" aria-hidden="true"></div>
+
+      <!-- Botón para Abrir/Cerrar Filmstrip de Miniaturas -->
+      <button class="toolbar-btn" id="btn-toggle-filmstrip" title="Ver galería de miniaturas">
+        <span>🎞️</span>
+        <span class="label">Miniaturas</span>
+      </button>
+    </nav>
+
+    <!-- Cajón Inferior de Miniaturas (Filmstrip Drawer) -->
+    <aside class="filmstrip-drawer glass-panel" id="bottom-filmstrip-drawer" aria-label="Cinta de miniaturas">
+      <div class="filmstrip-header">
+        <span>Vista previa rápida de páginas</span>
+        <button class="header-btn" id="btn-close-filmstrip" title="Ocultar miniaturas" style="padding:0.2rem 0.5rem; font-size:0.75rem">✕ Cerrar</button>
+      </div>
+      <div class="filmstrip-track" id="filmstrip-track">
+        <!-- Miniaturas generadas dinámicamente -->
+      </div>
+    </aside>
+
+    <!-- MODAL DE INSPECCIÓN Y ZOOM DE ALTA RESOLUCIÓN -->
+    <section class="zoom-overlay hidden" id="zoom-modal-container" role="dialog" aria-modal="true" aria-labelledby="zoom-page-title">
+      <!-- Barra Superior de Zoom -->
+      <header class="zoom-header glass-panel">
+        <span class="zoom-title-label" id="zoom-page-title">Página en Inspección</span>
+        <span class="zoom-percentage-badge" id="zoom-percentage-badge">100%</span>
+        
+        <button class="zoom-ctrl-btn" id="btn-zoom-in" title="Acercar (+)">+</button>
+        <button class="zoom-ctrl-btn" id="btn-zoom-out" title="Alejar (-)">−</button>
+        <button class="zoom-ctrl-btn" id="btn-zoom-reset" title="Restablecer (0)">↺</button>
+        <button class="zoom-close-btn" id="btn-close-zoom" title="Salir del Zoom (ESC)">✕</button>
+      </header>
+
+      <!-- Viewport de Arrastre Panorámico -->
+      <div class="zoom-viewport" id="zoom-viewport">
+        <img id="zoom-inspect-img" class="zoom-inspect-img" src="" alt="Vista ampliada de documento escaneado" />
+      </div>
+
+      <!-- Minimapa de Orientación -->
+      <div class="zoom-minimap-container glass-panel" id="zoom-minimap">
+        <img id="zoom-minimap-img" class="zoom-minimap-img" src="" alt="Minimapa de página completa" />
+        <div id="zoom-minimap-rect" class="zoom-minimap-rect"></div>
+      </div>
+
+      <!-- Instrucciones de Uso -->
+      <div class="zoom-hint-banner glass-panel">
+        <span>Arrastra para navegar • Rueda del mouse para zoom • Flechas del teclado • ESC para salir</span>
+      </div>
+    </section>
+
+    <!-- MODAL DE GESTIÓN, SUBIDA EN LOTE Y COMPRESIÓN -->
+    <section class="modal-overlay hidden" id="page-manager-modal" role="dialog" aria-modal="true" aria-labelledby="manager-title">
+      <div class="manager-modal-card glass-panel">
+        <div class="modal-header">
+          <h2 id="manager-title"><span>📚</span> Gestor de Páginas y Documentos Escaneados</h2>
+          <button class="header-btn" id="btn-close-manager" title="Cerrar modal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Zona de Carga Arrastrar y Soltar -->
+          <div class="upload-dropzone" id="manager-dropzone">
+            <input type="file" id="manager-file-input" multiple accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" />
+            <div class="dropzone-icon">📥</div>
+            <div class="dropzone-title">Arrastra imágenes escaneadas o documentos PDF aquí</div>
+            <div class="dropzone-subtitle">o haz clic para explorar tus archivos locales</div>
+            <div class="dropzone-tags">
+              <span class="tag-badge">JPG / JPEG</span>
+              <span class="tag-badge">PNG</span>
+              <span class="tag-badge">WEBP</span>
+              <span class="tag-badge">PDF Multipage</span>
+            </div>
+          </div>
+
+          <!-- Barra de Progreso durante procesamiento -->
+          <div class="progress-container hidden" id="manager-progress-container">
+            <div class="progress-status" id="manager-progress-status">Procesando páginas...</div>
+            <div class="progress-track">
+              <div class="progress-bar" id="manager-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- Panel de Opciones de Compresión en el Cliente -->
+          <div class="compression-panel">
+            <label class="compression-toggle">
+              <input type="checkbox" id="compression-enable-check" checked />
+              <span>Optimización & Compresión Ligera en Cliente</span>
+            </label>
+
+            <div class="compression-controls">
+              <span>Resolución máx:</span>
+              <select class="compression-select" id="compression-dimension-select">
+                <option value="1800" selected>1800 px (Alta nitidez de texto)</option>
+                <option value="1400">1400 px (Equilibrada)</option>
+                <option value="1000">1000 px (Ultra liviana)</option>
+                <option value="9999">Original (Sin reducir escala)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Barra de Acciones de Reordenamiento -->
+          <div class="manager-toolbar">
+            <div class="manager-toolbar-group">
+              <span style="font-weight:600; font-size:0.9rem;" id="manager-pages-count">0 páginas</span>
+            </div>
+            
+            <div class="manager-toolbar-group">
+              <button class="tool-action-btn" id="btn-sort-asc" title="Ordenar por nombre A-Z (números naturales)">
+                <span>🔤</span> A-Z
+              </button>
+              <button class="tool-action-btn" id="btn-sort-desc" title="Ordenar por nombre Z-A">
+                <span>🔤</span> Z-A
+              </button>
+              <button class="tool-action-btn" id="btn-sort-reverse" title="Invertir orden de lectura">
+                <span>🔄</span> Invertir
+              </button>
+              <button class="tool-action-btn" id="btn-load-sample-book" title="Cargar libro histórico de muestra">
+                <span>🏛️</span> Muestra
+              </button>
+              <button class="tool-action-btn danger" id="btn-clear-all-pages" title="Vaciar todas las páginas">
+                <span>🗑️</span> Limpiar
+              </button>
+            </div>
+          </div>
+
+          <!-- Rejilla de Miniaturas Ordenables -->
+          <div class="manager-pages-grid" id="manager-pages-grid">
+            <!-- Tarjetas de página generadas dinámicamente -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="header-btn" id="btn-cancel-manager" onclick="document.getElementById('page-manager-modal').classList.add('hidden')">
+            Cancelar
+          </button>
+          <button class="header-btn primary" id="btn-apply-manager">
+            <span>✨ Aplicar y Generar Flipbook</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL DE ATAJOS DE TECLADO -->
+    <section class="modal-overlay hidden" id="keyboard-help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="manager-modal-card glass-panel" style="max-width: 540px;">
+        <div class="modal-header">
+          <h2 id="help-title"><span>⌨️</span> Atajos de Teclado</h2>
+          <button class="header-btn" id="btn-close-help">✕</button>
+        </div>
+        <div class="modal-body" style="gap: 1rem;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">→ / Espacio / AvPág</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Pasar a la siguiente página</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">← / RePág</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Regresar a la página anterior</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">Inicio / Fin (Home/End)</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Primera / Última página</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">Z</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Activar / desactivar Zoom HD</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">M</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Silenciar / Activar sonido de papel</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">F</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Alternar Pantalla Completa</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">+ / − / 0 (en Zoom)</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Acercar / Alejar / Restablecer</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">ESC</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Cerrar cualquier ventana modal o zoom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Librerías de Terceros Vendoreadas Localmente (Cero fallos de red) -->
+  <script src="vendor/page-flip.browser.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+
+  <!-- Script Modular Principal -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

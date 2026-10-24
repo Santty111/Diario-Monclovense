@@ -1,0 +1,167 @@
+/* ==========================================================================
+   LuminaFlip - Flipbook Stage, 3D Book Realism & Navigation Overlays
+   ========================================================================== */
+
+.app-viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Área central de lectura */
+.flipbook-stage {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 4rem;
+  perspective: 2500px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .flipbook-stage {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Contenedor del libro interactivo */
+.flipbook-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1500px;
+  max-height: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.75));
+}
+
+/* Elemento target generado por StPageFlip */
+.flipbook-book {
+  position: relative;
+  margin: auto;
+  box-shadow: var(--shadow-book);
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+/* Realismo de lomo central para vista de 2 páginas (Spread) */
+.flipbook-stage::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 50%;
+  width: 24px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 50;
+  background: linear-gradient(
+    90deg, 
+    rgba(0, 0, 0, 0.25) 0%, 
+    rgba(0, 0, 0, 0.05) 30%, 
+    rgba(0, 0, 0, 0.35) 50%, 
+    rgba(0, 0, 0, 0.05) 70%, 
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+}
+
+/* En pantallas pequeñas (vista vertical de 1 página), ocultar el lomo doble */
+@media (max-width: 768px) {
+  .flipbook-stage::after {
+    display: none;
+  }
+}
+
+/* Botones flotantes de navegación lateral (Prev / Next) */
+.nav-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 80;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  background: rgba(18, 22, 31, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-md);
+  font-size: 1.4rem;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.nav-arrow-btn:hover:not(:disabled) {
+  background: var(--bg-glass-hover);
+  border-color: var(--gold-primary);
+  color: var(--gold-light);
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.nav-arrow-btn:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.nav-arrow-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.nav-arrow-btn.prev {
+  left: 1.25rem;
+}
+
+.nav-arrow-btn.next {
+  right: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .nav-arrow-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+  }
+  .nav-arrow-btn.prev {
+    left: 0.5rem;
+  }
+  .nav-arrow-btn.next {
+    right: 0.5rem;
+  }
+}
+
+/* Indicador flotante central de página */
+.page-indicator-floating {
+  position: absolute;
+  bottom: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  pointer-events: auto;
+}
+
+.page-indicator-floating .badge-text {
+  color: var(--gold-light);
+  font-weight: 600;
+}

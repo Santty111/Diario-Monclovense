@@ -1,0 +1,597 @@
+/**
+ * LuminaFlip - Aplicación Principal
+ * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
+ */
+import { AudioFX } from './audio-fx.js';
+import { PageManager } from './page-manager.js';
+import { FlipbookEngine } from './flipbook-engine.js';
+import { ZoomController } from './zoom-controller.js';
+import { SAMPLE_PAGES } from './sample-book.js';
+
+class LuminaFlipApp {
+  constructor() {
+    this.audioFX = new AudioFX();
+    this.pageManager = new PageManager();
+    this.flipbook = null;
+    this.zoomController = null;
+
+    this.isAutoPlay = false;
+    this.autoPlayTimer = null;
+    this.autoPlayInterval = 5000;
+
+    this.isFilmstripOpen = false;
+  }
+
+  async init() {
+    this._initFlipbook();
+    this._initZoom();
+    this._bindUI();
+    this._bindKeyboard();
+    this._loadInitialBook();
+  }
+
+  _initFlipbook() {
+    const container = document.getElementById('flipbook-stage-container');
+    this.flipbook = new FlipbookEngine({
+      container: container,
+      audioFX: this.audioFX,
+      onPageChange: (info) => this._onPageUpdated(info),
+      onInit: (info) => this._onPageUpdated(info)
+    });
+  }
+
+  _initZoom() {
+    this.zoomController = new ZoomController({
+      container: document.getElementById('zoom-modal-container'),
+      viewport: document.getElementById('zoom-viewport'),
+      content: document.getElementById('zoom-inspect-img'),
+      minimap: document.getElementById('zoom-minimap'),
+      minimapImg: document.getElementById('zoom-minimap-img'),
+      minimapRect: document.getElementById('zoom-minimap-rect'),
+      onClose: () => {
+        // Al salir de zoom, reenfocar el flipbook
+      }
+    });
+  }
+
+  _loadInitialBook() {
+    // Inicializar el PageManager con las páginas de muestra
+    SAMPLE_PAGES.forEach(p => {
+      this.pageManager.addCustomPage({
+        name: p.name,
+        url: p.url,
+        width: p.width,
+        height: p.height,
+        rotation: 0
+      });
+    });
+
+    this.flipbook.loadBook(this.pageManager.getPages());
+    this._renderFilmstrip();
+  }
+
+  _onPageUpdated(info) {
+    const { currentPage, totalPages, mode } = info;
+    const isSpread = mode !== 'portrait';
+
+    // Actualizar indicador de páginas
+    const counterBadge = document.getElementById('page-counter-badge');
+    const pageJumpInput = document.getElementById('jump-page-input');
+
+    if (counterBadge) {
+      if (isSpread && currentPage > 0 && currentPage < totalPages - 1) {
+        const leftP = currentPage;
+        const rightP = Math.min(totalPages, currentPage + 1);
+        counterBadge.textContent = `Páginas ${leftP} - ${rightP} de ${totalPages}`;
+      } else {
+        counterBadge.textContent = `Página ${currentPage + 1} de ${totalPages}`;
+      }
+    }
+
+    if (pageJumpInput) {
+      pageJumpInput.value = currentPage + 1;
+      pageJumpInput.max = totalPages;
+    }
+
+    // Actualizar indicador en filmstrip
+    this._highlightActiveThumbnail(currentPage);
+  }
+
+  _bindUI() {
+    // 1. Navegación manual flechas
+    document.getElementById('btn-nav-prev')?.addEventListener('click', () => {
+      this._pauseAutoPlay();
+      this.flipbook.flipPrev();
+    });
+
+    document.getElementById('btn-nav-next')?.addEventListener('click', () => {
+      this._pauseAutoPlay();
+      this.flipbook.flipNext();
+    });
+
+    // 2. Salto directo de página
+    const jumpInput = document.getElementById('jump-page-input');
+    jumpInput?.addEventListener('change', (e) => {
+      const p = parseInt(e.target.value, 10);
+      if (!isNaN(p) && p >= 1) {
+        this.flipbook.goToPage(p - 1);
+      }
+    });
+
+    // 3. Audio Mute / Unmute y volumen
+    const muteBtn = document.getElementById('btn-toggle-mute');
+    this._updateMuteUI(this.audioFX.isMuted);
+
+    muteBtn?.addEventListener('click', () => {
+      const isMuted = this.audioFX.toggleMute();
+      this._updateMuteUI(isMuted);
+      if (!isMuted) {
+        this.audioFX.playPageTurn();
+      }
+    });
+
+    const volSlider = document.getElementById('audio-volume-slider');
+    if (volSlider) {
+      volSlider.value = this.audioFX.volume * 100;
+      volSlider.addEventListener('input', (e) => {
+        this.audioFX.setVolume(parseFloat(e.target.value) / 100);
+      });
+    }
+
+    // 4. Modos de vista (Auto / Doble Página / Página Simple)
+    document.getElementById('btn-view-auto')?.addEventListener('click', () => {
+      this._setActiveViewBtn('btn-view-auto');
+      this.flipbook.setViewMode('auto');
+    });
+
+    document.getElementById('btn-view-double')?.addEventListener('click', () => {
+      this._setActiveViewBtn('btn-view-double');
+      this.flipbook.setViewMode('double');
+    });
+
+    document.getElementById('btn-view-single')?.addEventListener('click', () => {
+      this._setActiveViewBtn('btn-view-single');
+      this.flipbook.setViewMode('single');
+    });
+
+    // 5. Botón Zoom / Inspección
+    document.getElementById('btn-toggle-zoom')?.addEventListener('click', () => {
+      const currentSrc = this.flipbook.getCurrentImageSrc();
+      const meta = this.flipbook.getCurrentMetadata();
+      if (currentSrc) {
+        this.zoomController.open(currentSrc, meta ? meta.name : `Página ${this.flipbook.getCurrentPage() + 1}`);
+      }
+    });
+
+    document.getElementById('btn-close-zoom')?.addEventListener('click', () => {
+      this.zoomController.close();
+    });
+
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
+      this.zoomController.zoomBy(1.25);
+    });
+
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
+      this.zoomController.zoomBy(0.8);
+    });
+
+    document.getElementById('btn-zoom-reset')?.addEventListener('click', () => {
+      this.zoomController.resetZoom();
+    });
+
+    // 6. Pantalla completa (Fullscreen)
+    document.getElementById('btn-toggle-fullscreen')?.addEventListener('click', () => {
+      this._toggleFullscreen();
+    });
+
+    // 7. Auto-play / Modo Presentación
+    const autoPlayBtn = document.getElementById('btn-toggle-autoplay');
+    autoPlayBtn?.addEventListener('click', () => {
+      this._toggleAutoPlay();
+    });
+
+    // 8. Filmstrip Drawer (Cajón de miniaturas inferior)
+    const filmstripToggle = document.getElementById('btn-toggle-filmstrip');
+    const filmstripDrawer = document.getElementById('bottom-filmstrip-drawer');
+    filmstripToggle?.addEventListener('click', () => {
+      this.isFilmstripOpen = !this.isFilmstripOpen;
+      filmstripDrawer?.classList.toggle('open', this.isFilmstripOpen);
+      filmstripToggle?.classList.toggle('active', this.isFilmstripOpen);
+    });
+
+    document.getElementById('btn-close-filmstrip')?.addEventListener('click', () => {
+      this.isFilmstripOpen = false;
+      filmstripDrawer?.classList.remove('open');
+      filmstripToggle?.classList.remove('active');
+    });
+
+    // 9. Modal de Gestión de Páginas y Subida en Lote
+    const managerModal = document.getElementById('page-manager-modal');
+    document.getElementById('btn-open-manager')?.addEventListener('click', () => {
+      this._renderManagerGrid();
+      managerModal?.classList.remove('hidden');
+    });
+
+    document.getElementById('btn-close-manager')?.addEventListener('click', () => {
+      managerModal?.classList.add('hidden');
+    });
+
+    // Dropzone y File Input
+    const dropzone = document.getElementById('manager-dropzone');
+    const fileInput = document.getElementById('manager-file-input');
+
+    dropzone?.addEventListener('click', () => fileInput?.click());
+    fileInput?.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        this._handleFilesSelected(e.target.files);
+      }
+      e.target.value = '';
+    });
+
+    dropzone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-active');
+    });
+
+    dropzone?.addEventListener('dragleave', () => {
+      dropzone.classList.remove('drag-active');
+    });
+
+    dropzone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-active');
+      if (e.dataTransfer.files.length > 0) {
+        this._handleFilesSelected(e.dataTransfer.files);
+      }
+    });
+
+    // Botones de ordenamiento en el gestor
+    document.getElementById('btn-sort-asc')?.addEventListener('click', () => {
+      this.pageManager.sortNatural(true);
+      this._renderManagerGrid();
+    });
+
+    document.getElementById('btn-sort-desc')?.addEventListener('click', () => {
+      this.pageManager.sortNatural(false);
+      this._renderManagerGrid();
+    });
+
+    document.getElementById('btn-sort-reverse')?.addEventListener('click', () => {
+      this.pageManager.reverseOrder();
+      this._renderManagerGrid();
+    });
+
+    document.getElementById('btn-clear-all-pages')?.addEventListener('click', () => {
+      if (confirm('¿Seguro que deseas eliminar todas las páginas del libro?')) {
+        this.pageManager.clear();
+        this._renderManagerGrid();
+      }
+    });
+
+    document.getElementById('btn-load-sample-book')?.addEventListener('click', () => {
+      this.pageManager.clear();
+      SAMPLE_PAGES.forEach(p => {
+        this.pageManager.addCustomPage({
+          name: p.name,
+          url: p.url,
+          width: p.width,
+          height: p.height,
+          rotation: 0
+        });
+      });
+      this._renderManagerGrid();
+    });
+
+    // Botón "Generar y Aplicar Flipbook"
+    document.getElementById('btn-apply-manager')?.addEventListener('click', () => {
+      const currentPages = this.pageManager.getPages();
+      if (currentPages.length === 0) {
+        alert('Agrega al menos una página antes de generar el libro.');
+        return;
+      }
+      this.flipbook.loadBook(currentPages);
+      this._renderFilmstrip();
+      managerModal?.classList.add('hidden');
+    });
+
+    // Control de compresión del cliente
+    const compressCheckbox = document.getElementById('compression-enable-check');
+    compressCheckbox?.addEventListener('change', (e) => {
+      this.pageManager.compressionSettings.enabled = e.target.checked;
+    });
+
+    const compressMaxDim = document.getElementById('compression-dimension-select');
+    compressMaxDim?.addEventListener('change', (e) => {
+      this.pageManager.compressionSettings.maxDimension = parseInt(e.target.value, 10);
+    });
+
+    // 10. Modal de Atajos de Teclado
+    const helpModal = document.getElementById('keyboard-help-modal');
+    document.getElementById('btn-open-help')?.addEventListener('click', () => {
+      helpModal?.classList.remove('hidden');
+    });
+    document.getElementById('btn-close-help')?.addEventListener('click', () => {
+      helpModal?.classList.add('hidden');
+    });
+  }
+
+  async _handleFilesSelected(files) {
+    const progressContainer = document.getElementById('manager-progress-container');
+    const progressBar = document.getElementById('manager-progress-bar');
+    const progressStatus = document.getElementById('manager-progress-status');
+
+    if (progressContainer) progressContainer.classList.remove('hidden');
+
+    try {
+      await this.pageManager.processFiles(files, (curr, total, name) => {
+        const pct = Math.round((curr / total) * 100);
+        if (progressBar) progressBar.style.width = `${pct}%`;
+        if (progressStatus) progressStatus.textContent = `Procesando ${curr}/${total}: ${name}`;
+      });
+    } catch (err) {
+      console.error('Error al procesar lote:', err);
+      alert('Ocurrió un error al procesar algunos archivos.');
+    } finally {
+      if (progressContainer) progressContainer.classList.add('hidden');
+      this._renderManagerGrid();
+    }
+  }
+
+  _renderManagerGrid() {
+    const grid = document.getElementById('manager-pages-grid');
+    const countBadge = document.getElementById('manager-pages-count');
+    if (!grid) return;
+
+    const pages = this.pageManager.getPages();
+    if (countBadge) countBadge.textContent = `${pages.length} páginas`;
+
+    grid.innerHTML = '';
+
+    if (pages.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <p>No hay páginas cargadas. Arrastra archivos arriba o haz clic en "Cargar Libro de Muestra".</p>
+        </div>
+      `;
+      return;
+    }
+
+    pages.forEach((page, index) => {
+      const card = document.createElement('div');
+      card.className = 'manager-page-card';
+      card.setAttribute('draggable', 'true');
+      card.dataset.index = index;
+
+      card.innerHTML = `
+        <div class="card-thumb-wrap">
+          <img src="${page.url}" alt="${page.name}" style="transform: rotate(${page.rotation || 0}deg)" />
+          <span class="card-num-badge">#${index + 1}</span>
+        </div>
+        <div class="card-info">
+          <span class="card-title" title="${page.name}">${page.name}</span>
+          ${page.savingsPercent ? `<span class="card-savings">Ahorro: -${page.savingsPercent}%</span>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="btn-card-action" data-action="left" title="Mover a la izquierda" ${index === 0 ? 'disabled' : ''}>←</button>
+          <button class="btn-card-action" data-action="right" title="Mover a la derecha" ${index === pages.length - 1 ? 'disabled' : ''}>→</button>
+          <button class="btn-card-action" data-action="rotate" title="Rotar 90°">↻</button>
+          <button class="btn-card-action" data-action="duplicate" title="Duplicar">⧉</button>
+          <button class="btn-card-action danger" data-action="delete" title="Eliminar">✕</button>
+        </div>
+      `;
+
+      // Eventos de acciones
+      card.querySelectorAll('.btn-card-action').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+          if (action === 'left') {
+            this.pageManager.movePage(index, index - 1);
+          } else if (action === 'right') {
+            this.pageManager.movePage(index, index + 1);
+          } else if (action === 'rotate') {
+            this.pageManager.rotatePage(index, 90);
+          } else if (action === 'duplicate') {
+            this.pageManager.duplicatePage(index);
+          } else if (action === 'delete') {
+            this.pageManager.removePage(index);
+          }
+          this._renderManagerGrid();
+        });
+      });
+
+      // Drag and Drop para reordenar en la rejilla
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', index);
+        card.classList.add('is-dragging');
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('is-dragging');
+      });
+
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        card.classList.add('drag-hover');
+      });
+
+      card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-hover');
+      });
+
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-hover');
+        const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        if (!isNaN(fromIdx) && fromIdx !== index) {
+          this.pageManager.movePage(fromIdx, index);
+          this._renderManagerGrid();
+        }
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  _renderFilmstrip() {
+    const strip = document.getElementById('filmstrip-track');
+    if (!strip) return;
+    strip.innerHTML = '';
+
+    const pages = this.flipbook.pages;
+    pages.forEach((src, idx) => {
+      const item = document.createElement('button');
+      item.className = 'filmstrip-item';
+      item.dataset.index = idx;
+      item.innerHTML = `
+        <div class="thumb-frame">
+          <img src="${src}" alt="Miniatura ${idx + 1}" loading="lazy" />
+        </div>
+        <span class="thumb-label">${idx + 1}</span>
+      `;
+      item.addEventListener('click', () => {
+        this._pauseAutoPlay();
+        this.flipbook.goToPage(idx);
+      });
+      strip.appendChild(item);
+    });
+
+    this._highlightActiveThumbnail(this.flipbook.getCurrentPage());
+  }
+
+  _highlightActiveThumbnail(pageIndex) {
+    const items = document.querySelectorAll('.filmstrip-item');
+    items.forEach(el => {
+      const idx = parseInt(el.dataset.index, 10);
+      el.classList.toggle('active', idx === pageIndex);
+      if (idx === pageIndex) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+  }
+
+  _setActiveViewBtn(activeId) {
+    ['btn-view-auto', 'btn-view-double', 'btn-view-single'].forEach(id => {
+      document.getElementById(id)?.classList.toggle('active', id === activeId);
+    });
+  }
+
+  _updateMuteUI(isMuted) {
+    const muteBtn = document.getElementById('btn-toggle-mute');
+    if (!muteBtn) return;
+    muteBtn.classList.toggle('muted', isMuted);
+    muteBtn.setAttribute('title', isMuted ? 'Activar sonido de pasar página (M)' : 'Silenciar sonido (M)');
+    const icon = muteBtn.querySelector('.icon');
+    if (icon) {
+      icon.textContent = isMuted ? '🔇' : '🔊';
+    }
+  }
+
+  _toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  _toggleAutoPlay() {
+    this.isAutoPlay = !this.isAutoPlay;
+    const btn = document.getElementById('btn-toggle-autoplay');
+    btn?.classList.toggle('active', this.isAutoPlay);
+
+    if (this.isAutoPlay) {
+      if (btn) btn.querySelector('.label').textContent = 'Pausar';
+      this.autoPlayTimer = setInterval(() => {
+        if (this.flipbook.getCurrentPage() >= this.flipbook.getTotalPages() - 1) {
+          this.flipbook.goToPage(0);
+        } else {
+          this.flipbook.flipNext();
+        }
+      }, this.autoPlayInterval);
+    } else {
+      this._pauseAutoPlay();
+    }
+  }
+
+  _pauseAutoPlay() {
+    if (this.isAutoPlay) {
+      this.isAutoPlay = false;
+      clearInterval(this.autoPlayTimer);
+      const btn = document.getElementById('btn-toggle-autoplay');
+      btn?.classList.remove('active');
+      if (btn) btn.querySelector('.label').textContent = 'Auto-reproducir';
+    }
+  }
+
+  _bindKeyboard() {
+    window.addEventListener('keydown', (e) => {
+      // Si el foco está en un input numérico o texto, no interceptar
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+
+      // Si el modal de zoom está activo, el ZoomController gestiona sus atajos
+      if (this.zoomController?.isActive) return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault();
+          this._pauseAutoPlay();
+          this.flipbook.flipNext();
+          break;
+
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          this._pauseAutoPlay();
+          this.flipbook.flipPrev();
+          break;
+
+        case 'Home':
+          e.preventDefault();
+          this.flipbook.goToPage(0);
+          break;
+
+        case 'End':
+          e.preventDefault();
+          this.flipbook.goToPage(this.flipbook.getTotalPages() - 1);
+          break;
+
+        case 'z':
+        case 'Z':
+          e.preventDefault();
+          document.getElementById('btn-toggle-zoom')?.click();
+          break;
+
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          document.getElementById('btn-toggle-mute')?.click();
+          break;
+
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          this._toggleFullscreen();
+          break;
+
+        case '?':
+          e.preventDefault();
+          document.getElementById('keyboard-help-modal')?.classList.toggle('hidden');
+          break;
+
+        case 'Escape':
+          document.getElementById('page-manager-modal')?.classList.add('hidden');
+          document.getElementById('keyboard-help-modal')?.classList.add('hidden');
+          break;
+      }
+    });
+  }
+}
+
+// Inicializar la aplicación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  window.luminaFlip = new LuminaFlipApp();
+  window.luminaFlip.init();
+});
