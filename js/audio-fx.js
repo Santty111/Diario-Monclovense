@@ -49,22 +49,40 @@ export class AudioFX {
       console.warn("No se pudo inicializar HTML5 Audio pool:", e);
     }
 
-    // 3. Cargar preferencias persistentes
+    // 3. Garantizar que siempre inicie desmuteado con volumen al 100%
+    this.isMuted = false;
+    this.volume = 1.0;
     try {
-      const savedMute = localStorage.getItem("monflip_muted") ?? localStorage.getItem("lumina_flip_muted");
-      if (savedMute !== null) {
-        this.isMuted = (savedMute === "true");
-      } else {
-        this.isMuted = false;
-      }
-      const savedVol = localStorage.getItem("monflip_volume") ?? localStorage.getItem("lumina_flip_volume");
+      localStorage.removeItem("monflip_muted");
+      localStorage.removeItem("lumina_flip_muted");
+      const savedVol = localStorage.getItem("monflip_volume");
       if (savedVol !== null) {
-        this.volume = Math.max(0.1, Math.min(1.0, parseFloat(savedVol)));
+        this.volume = Math.max(0.2, Math.min(1.0, parseFloat(savedVol)));
       }
     } catch (e) {}
 
-    // 4. Intentar decodificar tan pronto como haya interacción
+    // 4. Pre-instanciar AudioContext y pre-decodificar el AudioBuffer de inmediato
+    this._predecode();
     this._initFetchBackup();
+  }
+
+  _predecode() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass && !this.audioCtx) {
+        this.audioCtx = new AudioContextClass();
+      }
+      if (this.audioCtx && this._rawWavArrayBuffer && !this.audioBuffer) {
+        this.audioCtx.decodeAudioData(
+          this._rawWavArrayBuffer.slice(0),
+          (decoded) => {
+            this.audioBuffer = decoded;
+            this.isUnlocked = true;
+          },
+          () => {}
+        );
+      }
+    } catch (e) {}
   }
 
   _initFetchBackup() {
@@ -138,13 +156,16 @@ export class AudioFX {
    * Reproduce el sonido de pasar página garantizando salida acústica inmediata
    */
   playPageTurn(options = {}) {
-    if (this.isMuted) return;
+    if (this.isMuted && !options.force) return;
+    if (options.force) {
+      this.isMuted = false;
+    }
 
     this.unlock();
 
     // Debounce de seguridad (120ms) para evitar repeticiones en ráfaga
     const now = Date.now();
-    if (now - this._lastPlayTime < 120) return;
+    if (!options.force && now - this._lastPlayTime < 120) return;
     this._lastPlayTime = now;
 
     let played = false;

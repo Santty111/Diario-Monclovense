@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.7.0';
-import { PageManager } from './page-manager.js?v=3.7.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.7.0';
-import { ZoomController } from './zoom-controller.js?v=3.7.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.7.0';
+import { AudioFX } from './audio-fx.js?v=3.8.0';
+import { PageManager } from './page-manager.js?v=3.8.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.8.0';
+import { ZoomController } from './zoom-controller.js?v=3.8.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.8.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -130,7 +130,7 @@ class LuminaFlipApp {
       }
     });
 
-    // 3. Audio Mute / Unmute y volumen
+    // 3. Audio Mute / Unmute, volumen y botón Probar Sonido
     const muteBtn = document.getElementById('btn-toggle-mute');
     this._updateMuteUI(this.audioFX.isMuted);
 
@@ -138,18 +138,26 @@ class LuminaFlipApp {
       const isMuted = this.audioFX.toggleMute();
       this._updateMuteUI(isMuted);
       if (!isMuted) {
-        this.audioFX.playPageTurn();
+        this.audioFX.playPageTurn({ force: true });
       }
+    });
+
+    const testBtn = document.getElementById('btn-test-sound');
+    testBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.audioFX.isMuted = false;
+      this._updateMuteUI(false);
+      this.audioFX.playPageTurn({ force: true });
     });
 
     const volSlider = document.getElementById('audio-volume-slider');
     if (volSlider) {
-      volSlider.value = this.audioFX.volume * 100;
+      volSlider.value = Math.round(this.audioFX.volume * 100);
       volSlider.addEventListener('input', (e) => {
         this.audioFX.setVolume(parseFloat(e.target.value) / 100);
       });
       volSlider.addEventListener('change', () => {
-        this.audioFX.playPageTurn();
+        this.audioFX.playPageTurn({ force: true });
       });
     }
 
