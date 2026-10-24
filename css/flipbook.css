@@ -48,7 +48,30 @@
   position: relative;
   margin: auto;
   box-shadow: var(--shadow-book);
-  transition: transform var(--duration-normal) var(--ease-smooth);
+  transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.25, 1);
+  will-change: transform;
+}
+
+/* Centrado suave de libro cerrado: portada sola a la derecha se centra en la vista */
+.flipbook-container.is-cover .flipbook-book {
+  transform: translate3d(-25%, 0, 0);
+}
+
+/* Centrado suave de libro cerrado: contraportada sola a la izquierda se centra en la vista */
+.flipbook-container.is-back-cover .flipbook-book {
+  transform: translate3d(25%, 0, 0);
+}
+
+.flipbook-container.is-open .flipbook-book {
+  transform: translate3d(0, 0, 0);
+}
+
+/* En pantallas móviles (vista vertical de 1 página), mantener centrado natural sin offset */
+@media (max-width: 768px) {
+  .flipbook-container.is-cover .flipbook-book,
+  .flipbook-container.is-back-cover .flipbook-book {
+    transform: translate3d(0, 0, 0) !important;
+  }
 }
 
 /* Realismo de lomo central para vista de 2 páginas (Spread) */
@@ -72,6 +95,13 @@
   );
   opacity: 0.85;
   mix-blend-mode: multiply;
+  transition: opacity 0.4s ease;
+}
+
+/* Ocultar la sombra de hendidura de lomo cuando el libro está cerrado */
+.flipbook-stage.stage-cover::after,
+.flipbook-stage.stage-back-cover::after {
+  opacity: 0 !important;
 }
 
 /* En pantallas pequeñas (vista vertical de 1 página), ocultar el lomo doble */

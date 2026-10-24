@@ -72,17 +72,21 @@ class LuminaFlipApp {
 
   _onPageUpdated(info) {
     const { currentPage, totalPages, mode } = info;
-    const isSpread = mode !== 'portrait';
+    const isSpread = mode !== 'portrait' && this.flipbook?.viewMode !== 'single';
 
-    // Actualizar indicador de páginas
+    // Actualizar indicador de páginas con estados cerrado/abierto
     const counterBadge = document.getElementById('page-counter-badge');
     const pageJumpInput = document.getElementById('jump-page-input');
 
     if (counterBadge) {
-      if (isSpread && currentPage > 0 && currentPage < totalPages - 1) {
-        const leftP = currentPage;
-        const rightP = Math.min(totalPages, currentPage + 1);
-        counterBadge.textContent = `Páginas ${leftP} - ${rightP} de ${totalPages}`;
+      if (currentPage === 0) {
+        counterBadge.textContent = `📕 Portada (Libro cerrado)`;
+      } else if (currentPage >= totalPages - 1) {
+        counterBadge.textContent = `📘 Contraportada (Libro cerrado)`;
+      } else if (isSpread) {
+        const leftP = currentPage + 1;
+        const rightP = Math.min(totalPages - 1, currentPage + 2);
+        counterBadge.textContent = `📖 Páginas ${leftP} - ${rightP} de ${totalPages}`;
       } else {
         counterBadge.textContent = `Página ${currentPage + 1} de ${totalPages}`;
       }
@@ -443,11 +447,15 @@ class LuminaFlipApp {
       const item = document.createElement('button');
       item.className = 'filmstrip-item';
       item.dataset.index = idx;
+      let label = `${idx + 1}`;
+      if (idx === 0) label = 'Portada';
+      else if (idx === pages.length - 1) label = 'Contraportada';
+
       item.innerHTML = `
         <div class="thumb-frame">
           <img src="${src}" alt="Miniatura ${idx + 1}" loading="lazy" />
         </div>
-        <span class="thumb-label">${idx + 1}</span>
+        <span class="thumb-label">${label}</span>
       `;
       item.addEventListener('click', () => {
         this._pauseAutoPlay();

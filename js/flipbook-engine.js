@@ -29,8 +29,23 @@ export class FlipbookEngine {
    */
   async loadBook(pagesList) {
     if (!pagesList || pagesList.length === 0) return;
-    this.pageMetadata = pagesList;
-    this.pages = pagesList.map(p => (typeof p === 'string' ? p : p.url));
+
+    let processed = [...pagesList];
+    // Asegurar que el total sea par para que la contraportada quede siempre como página única cerrada al final
+    if (processed.length > 1 && processed.length % 2 !== 0) {
+      const lastPage = processed[processed.length - 1];
+      const endpaper = {
+        name: 'Guardas Interiores',
+        url: processed[0].url,
+        width: lastPage.width || 1200,
+        height: lastPage.height || 1600,
+        rotation: 0
+      };
+      processed.splice(processed.length - 1, 0, endpaper);
+    }
+
+    this.pageMetadata = processed;
+    this.pages = processed.map(p => (typeof p === 'string' ? p : p.url));
     this.totalPages = this.pages.length;
 
     await this._initPageFlip();
@@ -85,7 +100,7 @@ export class FlipbookEngine {
       usePortrait: usePortrait,
       startPage: Math.min(this.currentPage, this.pages.length - 1),
       maxShadowOpacity: 0.65,
-      showCover: false,
+      showCover: true,
       mobileScrollSupport: false,
       swipeDistance: 25,
       clickEventForward: true,
@@ -207,9 +222,33 @@ export class FlipbookEngine {
   }
 
   _syncState() {
-    const isSpread = this.currentOrientation !== 'portrait';
+    const isSpread = this.currentOrientation !== 'portrait' && this.viewMode !== 'single';
     const isFirst = this.currentPage === 0;
-    const isLast = isSpread ? this.currentPage >= this.totalPages - 2 : this.currentPage >= this.totalPages - 1;
+    const isLast = this.currentPage >= this.totalPages - 1;
+
+    // Sincronizar clases de estado cerrado (portada/contraportada) en contenedor y stage
+    const stageWrapper = document.getElementById('flipbook-stage-wrapper');
+    if (this.container) {
+      this.container.classList.remove('is-cover', 'is-back-cover', 'is-open');
+      if (stageWrapper) {
+        stageWrapper.classList.remove('stage-cover', 'stage-back-cover', 'stage-open');
+      }
+
+      if (isSpread) {
+        if (isFirst) {
+          this.container.classList.add('is-cover');
+          if (stageWrapper) stageWrapper.classList.add('stage-cover');
+        } else if (isLast) {
+          this.container.classList.add('is-back-cover');
+          if (stageWrapper) stageWrapper.classList.add('stage-back-cover');
+        } else {
+          this.container.classList.add('is-open');
+          if (stageWrapper) stageWrapper.classList.add('stage-open');
+        }
+      } else {
+        if (stageWrapper) stageWrapper.classList.add('stage-open');
+      }
+    }
 
     // Actualizar botones de navegación anterior/siguiente
     const prevBtn = document.getElementById('btn-nav-prev');
