@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.4.0';
-import { PageManager } from './page-manager.js?v=3.4.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.4.0';
-import { ZoomController } from './zoom-controller.js?v=3.4.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.4.0';
+import { AudioFX } from './audio-fx.js?v=3.5.0';
+import { PageManager } from './page-manager.js?v=3.5.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.5.0';
+import { ZoomController } from './zoom-controller.js?v=3.5.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.5.0';
 
 class LuminaFlipApp {
   constructor() {

@@ -1,10 +1,11 @@
 /* ==========================================================================
    LuminaFlip - Top Header, Floating Toolbars & Thumbnails Drawer
+   Estética Minimalista B&W y Editorial Literario
    ========================================================================== */
 
 /* Barra Superior Glassmorphism */
 .app-header {
-  height: 64px;
+  height: 60px;
   width: 100%;
   padding: 0 1.5rem;
   display: flex;
@@ -21,33 +22,38 @@
 }
 
 .brand-logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--radius-sm);
-  background: var(--gold-gradient);
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0b0d13;
+  color: #09090b;
+  font-family: var(--font-serif);
   font-weight: 700;
-  font-size: 1.1rem;
-  box-shadow: 0 0 15px var(--gold-glow);
+  font-size: 1.15rem;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
 }
 
 .brand-title {
-  font-size: 1.15rem;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.03em;
+  color: #ffffff;
 }
 
 .brand-tag {
-  font-size: 0.75rem;
-  padding: 0.15rem 0.5rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
   border-radius: var(--radius-full);
-  background: rgba(212, 175, 55, 0.12);
-  color: var(--gold-light);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent-light);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 640px) {
@@ -66,50 +72,51 @@
 .header-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-glass);
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .header-btn:hover {
-  background: var(--bg-glass-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
 .header-btn.primary {
-  background: var(--gold-gradient);
-  color: #0a0b0e;
+  background: #ffffff;
+  color: #09090b;
   font-weight: 600;
-  border: none;
-  box-shadow: 0 4px 14px var(--gold-glow);
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
 }
 
 .header-btn.primary:hover {
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
-  transform: translateY(-1.5px);
+  background: #e4e4e7;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
-/* Grupo de botones de modo de vista */
+/* Grupo de botones de modo de vista (Segmented Control Minimalista) */
 .segmented-control {
   display: flex;
   align-items: center;
   padding: 3px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid var(--border-glass);
 }
 
 .segmented-btn {
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
+  padding: 0.32rem 0.75rem;
+  border-radius: var(--radius-full);
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-muted);
@@ -117,14 +124,14 @@
 }
 
 .segmented-btn:hover {
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 .segmented-btn.active {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--gold-light);
+  background: #ffffff;
+  color: #09090b;
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.18);
 }
 
 /* Control de sonido con slider desplegable */
@@ -162,12 +169,12 @@
   width: 100%;
   height: 4px;
   border-radius: 2px;
-  accent-color: var(--gold-primary);
+  accent-color: #ffffff;
   background: rgba(255, 255, 255, 0.15);
   cursor: pointer;
 }
 
-/* Barra Flotante Inferior (Bottom Toolbar) */
+/* Barra Flotante Inferior (Bottom Toolbar Minimalista) */
 .floating-bottom-toolbar {
   position: absolute;
   bottom: 1.25rem;
@@ -176,10 +183,14 @@
   z-index: 85;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 0.8rem;
+  gap: 0.5rem;
+  padding: 0.38rem 0.85rem;
   border-radius: var(--radius-full);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  background: rgba(14, 14, 18, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75);
   transition: transform var(--duration-normal) var(--ease-spring),
               opacity var(--duration-normal) var(--ease-smooth);
 }
@@ -203,30 +214,31 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.7rem;
+  padding: 0.38rem 0.7rem;
   border-radius: var(--radius-full);
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-main);
+  color: var(--text-muted);
   background: transparent;
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .toolbar-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--gold-light);
+  color: #ffffff;
 }
 
 .toolbar-btn.active {
-  background: rgba(212, 175, 55, 0.15);
-  color: var(--gold-light);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: #ffffff;
+  color: #09090b;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
 .toolbar-divider {
   width: 1px;
-  height: 20px;
-  background: var(--border-glass);
+  height: 18px;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Salto directo de página */
@@ -242,19 +254,20 @@
   width: 44px;
   padding: 0.25rem 0.35rem;
   border-radius: 6px;
-  border: 1px solid var(--border-glass);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(0, 0, 0, 0.4);
-  color: var(--gold-light);
-  font-family: inherit;
-  font-size: 0.85rem;
+  color: #ffffff;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
   font-weight: 600;
   text-align: center;
   outline: none;
+  transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .page-jump-input:focus {
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 0 1px var(--gold-primary);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
 }
 
 /* Cajón Desplegable de Miniaturas (Filmstrip Drawer) */
@@ -274,11 +287,11 @@
   transition: transform var(--duration-normal) var(--ease-spring),
               opacity var(--duration-fast) var(--ease-smooth),
               visibility var(--duration-fast) var(--ease-smooth);
-  border-top: 1px solid var(--border-glass);
-  box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.85);
-  background: rgba(14, 16, 22, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
+  background: rgba(12, 12, 16, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .filmstrip-drawer.open {
@@ -295,8 +308,8 @@
   padding: 0.45rem 1.25rem;
   font-size: 0.82rem;
   color: var(--text-muted);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .filmstrip-title-group {
@@ -306,14 +319,18 @@
 }
 
 .filmstrip-title {
+  font-family: var(--font-serif);
   font-weight: 600;
+  font-size: 0.95rem;
   color: var(--text-main);
   letter-spacing: 0.02em;
 }
 
 .filmstrip-hint {
-  font-size: 0.74rem;
-  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-dim);
 }
 
 @media (max-width: 640px) {
@@ -326,21 +343,21 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.3rem 0.85rem;
+  padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
   font-size: 0.78rem;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .filmstrip-close-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #ff9999;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
   transform: scale(1.03);
 }
 
@@ -366,7 +383,7 @@
   align-items: center;
   gap: 0.35rem;
   cursor: pointer;
-  opacity: 0.65;
+  opacity: 0.6;
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
@@ -380,20 +397,20 @@
 }
 
 .filmstrip-item .thumb-frame {
-  width: 60px;
-  height: 80px;
+  width: 58px;
+  height: 78px;
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid transparent;
   box-shadow: var(--shadow-sm);
-  background: #1a1e27;
+  background: #141418;
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .filmstrip-item.active .thumb-frame {
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 15px var(--gold-glow);
-  transform: scale(1.06);
+  border-color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
 }
 
 .filmstrip-item img {
@@ -405,11 +422,13 @@
 }
 
 .filmstrip-item .thumb-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-dim);
 }
 
 .filmstrip-item.active .thumb-label {
-  color: var(--gold-light);
+  color: #ffffff;
+  font-weight: 600;
 }
