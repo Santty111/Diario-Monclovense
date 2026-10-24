@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.5.0';
-import { PageManager } from './page-manager.js?v=3.5.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.5.0';
-import { ZoomController } from './zoom-controller.js?v=3.5.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.5.0';
+import { AudioFX } from './audio-fx.js?v=3.6.0';
+import { PageManager } from './page-manager.js?v=3.6.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.6.0';
+import { ZoomController } from './zoom-controller.js?v=3.6.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.6.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -102,6 +102,14 @@ class LuminaFlipApp {
   }
 
   _bindUI() {
+    // 0. Desbloqueo universal de AudioContext al primer gesto del usuario
+    const unlockAudio = () => {
+      this.audioFX.unlock();
+    };
+    ["pointerdown", "click", "keydown", "touchstart"].forEach(evt => {
+      window.addEventListener(evt, unlockAudio, { passive: true });
+    });
+
     // 1. Navegación manual flechas
     document.getElementById('btn-nav-prev')?.addEventListener('click', () => {
       this._pauseAutoPlay();
@@ -139,6 +147,9 @@ class LuminaFlipApp {
       volSlider.value = this.audioFX.volume * 100;
       volSlider.addEventListener('input', (e) => {
         this.audioFX.setVolume(parseFloat(e.target.value) / 100);
+      });
+      volSlider.addEventListener('change', () => {
+        this.audioFX.playPageTurn();
       });
     }
 

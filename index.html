@@ -1,32 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-  
+
   <!-- SEO y Metadatos -->
-  <title>LuminaFlip | Lector Interactivo de Libros y Documentos Escaneados</title>
-  <meta name="description" content="LuminaFlip es un visor interactivo de flipbook de alto rendimiento para libros y documentos escaneados. Animación 3D realista a 60 FPS, compresión en cliente, efectos de sonido y zoom de alta precisión." />
-  <meta name="keywords" content="flipbook, visor de libros, documentos escaneados, page flip, visor interactivo, lector pdf, animacion 3d de paginas" />
-  <meta name="author" content="LuminaFlip Senior Engineering" />
-  
+  <title>MonFlip | "Diario Monclovense" - Edición Escaneada Interactiva</title>
+  <meta name="description"
+    content="MonFlip es un visor interactivo de flipbook de alto rendimiento para libros y documentos escaneados. Animación 3D realista a 60 FPS, compresión en cliente, efectos de sonido y zoom de alta precisión." />
+  <meta name="keywords"
+    content="flipbook, visor de libros, documentos escaneados, page flip, visor interactivo, lector pdf, animacion 3d de paginas" />
+  <meta name="author" content="MonFlip Senior Engineering" />
+
   <!-- Open Graph / Redes Sociales -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="LuminaFlip - Lector Interactivo Flipbook 3D" />
-  <meta property="og:description" content="Visualizador fluido de documentos y libros escaneados con física realista de paso de hoja, zoom panorámico y sonido procedural." />
+  <meta property="og:title" content="MonFlip - Lector Interactivo Flipbook 3D" />
+  <meta property="og:description"
+    content="Visualizador fluido de documentos y libros escaneados con física realista de paso de hoja, zoom panorámico y sonido procedural." />
   <meta property="og:image" content="assets/sample/page-01-cover.jpg" />
   <meta name="theme-color" content="#0a0b0e" />
 
   <!-- Hojas de Estilo Modulares con Cache-Busting -->
-  <link rel="stylesheet" href="css/main.css?v=3.5.0" />
-  <link rel="stylesheet" href="css/flipbook.css?v=3.5.0" />
-  <link rel="stylesheet" href="css/toolbar.css?v=3.5.0" />
-  <link rel="stylesheet" href="css/manager.css?v=3.5.0" />
-  <link rel="stylesheet" href="css/zoom.css?v=3.5.0" />
+  <link rel="stylesheet" href="css/main.css?v=3.6.0" />
+  <link rel="stylesheet" href="css/flipbook.css?v=3.6.0" />
+  <link rel="stylesheet" href="css/toolbar.css?v=3.6.0" />
+  <link rel="stylesheet" href="css/manager.css?v=3.6.0" />
+  <link rel="stylesheet" href="css/zoom.css?v=3.6.0" />
 
   <!-- Favicon SVG en Data URI -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
 </head>
+
 <body>
   <div class="app-viewport" id="app-root">
 
@@ -35,7 +41,7 @@
       <div class="brand-section">
         <div class="brand-logo-icon" aria-hidden="true">L</div>
         <div>
-          <h1 class="brand-title">Lumina<span class="text-gradient-white">Flip</span></h1>
+          <h1 class="brand-title">Mon<span class="text-gradient-white">Flip</span></h1>
         </div>
         <span class="brand-tag">Folio Edition</span>
       </div>
@@ -50,17 +56,20 @@
 
         <!-- Control de Audio con Slider Desplegable -->
         <div class="audio-control-group">
-          <button class="header-btn" id="btn-toggle-mute" title="Silenciar / Activar sonido (M)" aria-label="Control de sonido">
+          <button class="header-btn" id="btn-toggle-mute" title="Silenciar / Activar sonido (M)"
+            aria-label="Control de sonido">
             <span class="icon">🔊</span>
           </button>
           <div class="volume-slider-popup glass-panel">
             <span style="font-size:0.75rem; color:var(--text-muted)">Vol:</span>
-            <input type="range" class="volume-slider" id="audio-volume-slider" min="0" max="100" value="75" aria-label="Volumen de sonido" />
+            <input type="range" class="volume-slider" id="audio-volume-slider" min="0" max="100" value="75"
+              aria-label="Volumen de sonido" />
           </div>
         </div>
 
         <!-- Pantalla Completa -->
-        <button class="header-btn" id="btn-toggle-fullscreen" title="Pantalla Completa (F)" aria-label="Pantalla completa">
+        <button class="header-btn" id="btn-toggle-fullscreen" title="Pantalla Completa (F)"
+          aria-label="Pantalla completa">
           <span>⛶</span>
         </button>
 
@@ -78,7 +87,7 @@
 
     <!-- Escenario Principal del Flipbook -->
     <main class="flipbook-stage" id="flipbook-stage-wrapper" role="main">
-      
+
       <!-- Flecha de Navegación Izquierda (Página Anterior) -->
       <button class="nav-arrow-btn prev" id="btn-nav-prev" title="Página Anterior (←)" aria-label="Página anterior">
         ‹
@@ -105,7 +114,8 @@
       <!-- Selector de Salto Rápido a Página -->
       <div class="page-jump-container">
         <span>Ir a:</span>
-        <input type="number" id="jump-page-input" class="page-jump-input" min="1" max="1" value="1" aria-label="Número de página para saltar" />
+        <input type="number" id="jump-page-input" class="page-jump-input" min="1" max="1" value="1"
+          aria-label="Número de página para saltar" />
       </div>
 
       <div class="toolbar-divider" aria-hidden="true"></div>
@@ -138,7 +148,8 @@
           <span class="filmstrip-title">Vista previa de páginas</span>
           <span class="filmstrip-hint">(Haz clic en una miniatura para saltar)</span>
         </div>
-        <button class="filmstrip-close-btn" id="btn-close-filmstrip" title="Cerrar vista previa (Esc)" aria-label="Cerrar vista previa">
+        <button class="filmstrip-close-btn" id="btn-close-filmstrip" title="Cerrar vista previa (Esc)"
+          aria-label="Cerrar vista previa">
           <span>✕</span>
           <span>Cerrar</span>
         </button>
@@ -149,12 +160,13 @@
     </aside>
 
     <!-- MODAL DE INSPECCIÓN Y ZOOM DE ALTA RESOLUCIÓN -->
-    <section class="zoom-overlay hidden" id="zoom-modal-container" role="dialog" aria-modal="true" aria-labelledby="zoom-page-title">
+    <section class="zoom-overlay hidden" id="zoom-modal-container" role="dialog" aria-modal="true"
+      aria-labelledby="zoom-page-title">
       <!-- Barra Superior de Zoom -->
       <header class="zoom-header glass-panel">
         <span class="zoom-title-label" id="zoom-page-title">Página en Inspección</span>
         <span class="zoom-percentage-badge" id="zoom-percentage-badge">100%</span>
-        
+
         <button class="zoom-ctrl-btn" id="btn-zoom-in" title="Acercar (+)">+</button>
         <button class="zoom-ctrl-btn" id="btn-zoom-out" title="Alejar (-)">−</button>
         <button class="zoom-ctrl-btn" id="btn-zoom-reset" title="Restablecer (0)">↺</button>
@@ -179,7 +191,8 @@
     </section>
 
     <!-- MODAL DE GESTIÓN, SUBIDA EN LOTE Y COMPRESIÓN -->
-    <section class="modal-overlay hidden" id="page-manager-modal" role="dialog" aria-modal="true" aria-labelledby="manager-title">
+    <section class="modal-overlay hidden" id="page-manager-modal" role="dialog" aria-modal="true"
+      aria-labelledby="manager-title">
       <div class="manager-modal-card glass-panel">
         <div class="modal-header">
           <h2 id="manager-title"><span>📚</span> Gestor de Páginas y Documentos Escaneados</h2>
@@ -189,7 +202,8 @@
         <div class="modal-body">
           <!-- Zona de Carga Arrastrar y Soltar -->
           <div class="upload-dropzone" id="manager-dropzone">
-            <input type="file" id="manager-file-input" multiple accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" />
+            <input type="file" id="manager-file-input" multiple accept="image/jpeg,image/png,image/webp,application/pdf"
+              class="hidden" />
             <div class="dropzone-icon">📥</div>
             <div class="dropzone-title">Arrastra imágenes escaneadas o documentos PDF aquí</div>
             <div class="dropzone-subtitle">o haz clic para explorar tus archivos locales</div>
@@ -232,7 +246,7 @@
             <div class="manager-toolbar-group">
               <span style="font-weight:600; font-size:0.9rem;" id="manager-pages-count">0 páginas</span>
             </div>
-            
+
             <div class="manager-toolbar-group">
               <button class="tool-action-btn" id="btn-sort-asc" title="Ordenar por nombre A-Z (números naturales)">
                 <span>🔤</span> A-Z
@@ -259,7 +273,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="header-btn" id="btn-cancel-manager" onclick="document.getElementById('page-manager-modal').classList.add('hidden')">
+          <button class="header-btn" id="btn-cancel-manager"
+            onclick="document.getElementById('page-manager-modal').classList.add('hidden')">
             Cancelar
           </button>
           <button class="header-btn primary" id="btn-apply-manager">
@@ -270,7 +285,8 @@
     </section>
 
     <!-- MODAL DE ATAJOS DE TECLADO -->
-    <section class="modal-overlay hidden" id="keyboard-help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <section class="modal-overlay hidden" id="keyboard-help-modal" role="dialog" aria-modal="true"
+      aria-labelledby="help-title">
       <div class="manager-modal-card glass-panel" style="max-width: 540px;">
         <div class="modal-header">
           <h2 id="help-title"><span>⌨️</span> Atajos de Teclado</h2>
@@ -320,10 +336,11 @@
   </div>
 
   <!-- Librerías de Terceros Vendoreadas Localmente (Cero fallos de red) -->
-  <script src="vendor/page-flip.browser.js?v=3.5.0"></script>
-  <script src="vendor/pdf.min.js?v=3.5.0"></script>
+  <script src="vendor/page-flip.browser.js?v=3.6.0"></script>
+  <script src="vendor/pdf.min.js?v=3.6.0"></script>
 
   <!-- Script Modular Principal -->
-  <script type="module" src="js/app.js?v=3.5.0"></script>
+  <script type="module" src="js/app.js?v=3.6.0"></script>
 </body>
+
 </html>
