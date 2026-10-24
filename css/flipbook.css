@@ -11,7 +11,7 @@
   overflow: hidden;
 }
 
-/* Área central de lectura */
+/* Área central de lectura con margen de seguridad garantizado para controles inferiores */
 .flipbook-stage {
   position: relative;
   flex: 1;
@@ -19,28 +19,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 4rem;
+  padding: 0.75rem 3.5rem 6.6rem 3.5rem;
   perspective: 2500px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .flipbook-stage {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem 5.8rem 0.75rem;
   }
 }
 
-/* Contenedor del libro interactivo */
+/* Contenedor del libro interactivo (completamente centrado en la zona visible) */
 .flipbook-container {
   position: relative;
   width: 100%;
   height: 100%;
-  max-width: 1500px;
-  max-height: 900px;
+  max-width: 1600px;
   display: flex;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.75));
+  box-sizing: border-box;
 }
 
 /* Elemento target generado por StPageFlip */
@@ -173,22 +174,29 @@
   }
 }
 
-/* Indicador flotante central de página */
+/* Indicador flotante central de página (posicionado en el espacio seguro inferior sin tocar el libro) */
 .page-indicator-floating {
   position: absolute;
-  bottom: 5.5rem;
+  bottom: 4.4rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 1rem;
+  padding: 0.35rem 0.95rem;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--text-muted);
   pointer-events: auto;
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.page-indicator-floating.filmstrip-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 150%);
 }
 
 .page-indicator-floating .badge-text {

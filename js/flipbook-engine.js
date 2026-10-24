@@ -90,13 +90,13 @@ export class FlipbookEngine {
     this.pageFlip = new PageFlipClass(bookElement, {
       width: dims.pageWidth,
       height: dims.pageHeight,
-      size: 'stretch',
-      minWidth: Math.round(dims.pageWidth * 0.5),
-      maxWidth: Math.round(dims.pageWidth * 1.6),
-      minHeight: Math.round(dims.pageHeight * 0.5),
-      maxHeight: Math.round(dims.pageHeight * 1.6),
+      size: 'fixed',
+      minWidth: dims.pageWidth,
+      maxWidth: dims.pageWidth,
+      minHeight: dims.pageHeight,
+      maxHeight: dims.pageHeight,
       drawShadow: true,
-      flippingTime: 750,
+      flippingTime: 700,
       usePortrait: usePortrait,
       startPage: Math.min(this.currentPage, this.pages.length - 1),
       maxShadowOpacity: 0.65,
@@ -164,46 +164,51 @@ export class FlipbookEngine {
    */
   _calculateDimensions() {
     const cWidth = this.container.clientWidth || window.innerWidth;
-    const cHeight = this.container.clientHeight || (window.innerHeight - 120);
+    const cHeight = this.container.clientHeight || (window.innerHeight - 140);
 
     const isPortrait = cWidth < 768 || cWidth < cHeight * 1.15;
     const isSinglePage = this.viewMode === 'single' || (this.viewMode === 'auto' && isPortrait);
 
-    // Relación de aspecto estándar para documentos escaneados (3:4 o ~0.72)
-    const pageAspect = 0.72; // width / height
+    // Relación de aspecto dinámica calculada a partir del documento real cargado
+    let pageAspect = 0.7467;
+    if (this.pageMetadata && this.pageMetadata[0]) {
+      const p = this.pageMetadata[0];
+      if (p.width && p.height && p.width > 0 && p.height > 0) {
+        pageAspect = p.width / p.height;
+      }
+    }
 
     let pageHeight, pageWidth;
 
     if (isSinglePage) {
-      // 1 página ocupa el ancho/alto disponible con márgenes
-      const availWidth = cWidth * 0.94;
-      const availHeight = cHeight * 0.92;
+      // 1 página: maximizar área visible garantizando que entre 100% entera (contain)
+      const availWidth = Math.floor(cWidth * 0.94);
+      const availHeight = Math.floor(cHeight * 0.94);
 
       if (availWidth / availHeight < pageAspect) {
-        pageWidth = Math.floor(availWidth);
+        pageWidth = availWidth;
         pageHeight = Math.floor(pageWidth / pageAspect);
       } else {
-        pageHeight = Math.floor(availHeight);
+        pageHeight = availHeight;
         pageWidth = Math.floor(pageHeight * pageAspect);
       }
     } else {
-      // 2 páginas lado a lado (Spread abierto)
-      const availWidth = cWidth * 0.95;
-      const availHeight = cHeight * 0.90;
+      // Vista doble (Spread abierto de 2 páginas lado a lado):
+      const availWidth = Math.floor(cWidth * 0.96);
+      const availHeight = Math.floor(cHeight * 0.94);
 
-      // 2 páginas de ancho combinadas
       if (availWidth / availHeight < pageAspect * 2) {
         pageWidth = Math.floor(availWidth / 2);
         pageHeight = Math.floor(pageWidth / pageAspect);
       } else {
-        pageHeight = Math.floor(availHeight);
+        pageHeight = availHeight;
         pageWidth = Math.floor(pageHeight * pageAspect);
       }
     }
 
     return {
-      pageWidth: Math.max(300, pageWidth),
-      pageHeight: Math.max(400, pageHeight),
+      pageWidth: Math.max(260, pageWidth),
+      pageHeight: Math.max(360, pageHeight),
       isPortrait: isPortrait,
       isSinglePage: isSinglePage
     };
@@ -214,13 +219,19 @@ export class FlipbookEngine {
     const dims = this._calculateDimensions();
     const shouldBePortrait = this.viewMode === 'single' || (this.viewMode === 'auto' && dims.isPortrait);
 
-    if (shouldBePortrait !== (this.currentOrientation === 'portrait')) {
-      // Cambio de orientación necesario (móvil vs escritorio)
+    const currentBounds = this.pageFlip.getBoundsRect ? this.pageFlip.getBoundsRect() : null;
+    const currentW = currentBounds ? currentBounds.pageWidth : 0;
+    const currentH = currentBounds ? currentBounds.height : 0;
+
+    if (
+      shouldBePortrait !== (this.currentOrientation === 'portrait') ||
+      Math.abs(dims.pageWidth - currentW) > 8 ||
+      Math.abs(dims.pageHeight - currentH) > 8
+    ) {
+      if (this.pageFlip) {
+        this.currentPage = this.pageFlip.getCurrentPageIndex();
+      }
       this._initPageFlip();
-    } else {
-      try {
-        this.pageFlip.update();
-      } catch (e) {}
     }
   }
 

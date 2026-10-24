@@ -71,9 +71,25 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`\n======================================================`);
-  console.log(`🚀 LuminaFlip Dev Server activo en: http://localhost:${PORT}`);
-  console.log(`📖 Flipbook interactivo listo para visualización y pruebas`);
-  console.log(`======================================================\n`);
+let currentPort = PORT;
+
+function startServer(port) {
+  server.listen(port, () => {
+    console.log(`\n======================================================`);
+    console.log(`🚀 LuminaFlip Dev Server activo en: http://localhost:${port}`);
+    console.log(`📖 Flipbook interactivo listo para visualización y pruebas`);
+    console.log(`======================================================\n`);
+  });
+}
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.log(`⚠️ Puerto ${currentPort} ocupado, intentando puerto ${currentPort + 1}...`);
+    currentPort++;
+    startServer(currentPort);
+  } else {
+    console.error("Error del servidor:", err);
+  }
 });
+
+startServer(currentPort);

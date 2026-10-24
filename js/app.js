@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.1.0';
-import { PageManager } from './page-manager.js?v=3.1.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.1.0';
-import { ZoomController } from './zoom-controller.js?v=3.1.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.1.0';
+import { AudioFX } from './audio-fx.js?v=3.2.0';
+import { PageManager } from './page-manager.js?v=3.2.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.2.0';
+import { ZoomController } from './zoom-controller.js?v=3.2.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.2.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -486,6 +486,7 @@ class LuminaFlipApp {
     filmstripDrawer?.classList.add('open');
     filmstripToggle?.classList.add('active');
     bottomToolbar?.classList.add('filmstrip-active');
+    document.getElementById('page-indicator')?.classList.add('filmstrip-hidden');
 
     this._centerActiveThumbnailInTrack();
   }
@@ -499,6 +500,7 @@ class LuminaFlipApp {
     filmstripDrawer?.classList.remove('open');
     filmstripToggle?.classList.remove('active');
     bottomToolbar?.classList.remove('filmstrip-active');
+    document.getElementById('page-indicator')?.classList.remove('filmstrip-hidden');
 
     // Restablecer cualquier desplazamiento residual del viewport
     window.scrollTo(0, 0);

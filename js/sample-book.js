@@ -6,8 +6,8 @@ export const SAMPLE_PAGES = [
   {
     name: 'Portada: De Sphaera Coelestis (1624)',
     url: 'assets/sample/page-01-cover.jpg',
-    width: 1200,
-    height: 1600,
+    width: 710,
+    height: 990,
     rotation: 0,
     description: 'Encuadernación renacentista en cuero labrado con esfera armilar en pan de oro.'
   },
@@ -46,8 +46,8 @@ export const SAMPLE_PAGES = [
   {
     name: 'Contraportada: Encuadernación Posterior',
     url: 'assets/sample/page-06-backcover.jpg',
-    width: 1200,
-    height: 1600,
+    width: 710,
+    height: 990,
     rotation: 0,
     description: 'Cubierta posterior en cuero curtido con ornamentos barrocos.'
   }
