@@ -44,13 +44,21 @@
   box-sizing: border-box;
 }
 
-/* Elemento target generado por StPageFlip */
+/* Elemento target generado por StPageFlip con bordes redondeados */
 .flipbook-book {
   position: relative;
   margin: auto;
+  border-radius: 10px;
   box-shadow: var(--shadow-book);
   transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.25, 1);
   will-change: transform;
+}
+
+.flipbook-book canvas,
+.stf__parent,
+.stf__wrapper,
+.stf__canvas {
+  border-radius: 10px;
 }
 
 /* Centrado suave de libro cerrado: portada sola a la derecha se centra en la vista */
