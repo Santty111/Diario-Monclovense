@@ -25,6 +25,8 @@ const MIME_TYPES = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.pdf': 'application/pdf',
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
   '.wasm': 'application/wasm',
   '.ico': 'image/x-icon'
 };

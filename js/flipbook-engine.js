@@ -122,6 +122,7 @@ export class FlipbookEngine {
     });
 
     this.pageFlip.on('changeState', (e) => {
+      if (this._isInitializing) return;
       if (e.data === 'flipping' || e.data === 'user_fold') {
         if (this.audioFX) {
           this.audioFX.playPageTurn();
@@ -131,9 +132,6 @@ export class FlipbookEngine {
 
     this.pageFlip.on('flip', (e) => {
       this.currentPage = e.data;
-      if (this.audioFX) {
-        this.audioFX.playPageTurn();
-      }
       this._syncState();
       this.onPageChange({
         currentPage: this.currentPage,
@@ -287,19 +285,16 @@ export class FlipbookEngine {
 
   flipNext() {
     if (!this.pageFlip) return;
-    if (this.audioFX) this.audioFX.playPageTurn();
     this.pageFlip.flipNext('bottom');
   }
 
   flipPrev() {
     if (!this.pageFlip) return;
-    if (this.audioFX) this.audioFX.playPageTurn();
     this.pageFlip.flipPrev('bottom');
   }
 
   goToPage(index) {
     if (!this.pageFlip) return;
-    if (this.audioFX) this.audioFX.playPageTurn();
     const target = Math.max(0, Math.min(this.totalPages - 1, index));
     this.pageFlip.flip(target);
   }
