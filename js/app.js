@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.8.0';
-import { PageManager } from './page-manager.js?v=3.8.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.8.0';
-import { ZoomController } from './zoom-controller.js?v=3.8.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.8.0';
+import { AudioFX } from './audio-fx.js?v=3.8.1';
+import { PageManager } from './page-manager.js?v=3.8.1';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.8.1';
+import { ZoomController } from './zoom-controller.js?v=3.8.1';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.8.1';
 
 class LuminaFlipApp {
   constructor() {
@@ -130,15 +130,32 @@ class LuminaFlipApp {
       }
     });
 
-    // 3. Audio Mute / Unmute, volumen y botón Probar Sonido
+    // 3. Audio Mute / Unmute, volumen, permanencia y botón Probar Sonido
+    const audioGroup = document.querySelector('.audio-control-group');
     const muteBtn = document.getElementById('btn-toggle-mute');
+    const volPopup = document.querySelector('.volume-slider-popup');
     this._updateMuteUI(this.audioFX.isMuted);
 
-    muteBtn?.addEventListener('click', () => {
+    muteBtn?.addEventListener('click', (e) => {
+      // Toggle estado persistente abierto en pantalla
+      audioGroup?.classList.toggle('is-open');
+
       const isMuted = this.audioFX.toggleMute();
       this._updateMuteUI(isMuted);
       if (!isMuted) {
         this.audioFX.playPageTurn({ force: true });
+      }
+    });
+
+    // Mantener popup abierto si se hace clic dentro de él
+    volPopup?.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Cerrar popup persistente al hacer clic fuera del grupo de audio
+    document.addEventListener('click', (e) => {
+      if (audioGroup && !audioGroup.contains(e.target)) {
+        audioGroup.classList.remove('is-open');
       }
     });
 
@@ -148,6 +165,7 @@ class LuminaFlipApp {
       this.audioFX.isMuted = false;
       this._updateMuteUI(false);
       this.audioFX.playPageTurn({ force: true });
+      audioGroup?.classList.add('is-open');
     });
 
     const volSlider = document.getElementById('audio-volume-slider');

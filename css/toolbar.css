@@ -134,7 +134,7 @@
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.18);
 }
 
-/* Control de sonido con slider desplegable */
+/* Control de sonido con slider desplegable y puente de hover continuo */
 .audio-control-group {
   position: relative;
   display: flex;
@@ -143,23 +143,38 @@
 
 .volume-slider-popup {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   right: 0;
-  margin-top: 8px;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-width: 215px;
+  gap: 0.65rem;
+  min-width: 220px;
   z-index: 120;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-6px);
-  transition: all var(--duration-fast) var(--ease-smooth);
+  transform: translateY(-4px);
+  transition: opacity var(--duration-fast) var(--ease-smooth),
+              transform var(--duration-fast) var(--ease-smooth);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
-.audio-control-group:hover .volume-slider-popup {
+/* Puente invisible que une el botón con el popup para que el cursor nunca pierda el hover */
+.volume-slider-popup::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: transparent;
+}
+
+/* Mostrar tanto por hover como por click persistente (.is-open) o focus */
+.audio-control-group:hover .volume-slider-popup,
+.audio-control-group.is-open .volume-slider-popup,
+.volume-slider-popup:focus-within {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
