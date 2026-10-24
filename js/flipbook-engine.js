@@ -108,10 +108,7 @@ export class FlipbookEngine {
       showPageCorners: true
     });
 
-    // Cargar páginas de imagen
-    this.pageFlip.loadFromImages(this.pages);
-
-    // Enlazar eventos de PageFlip
+    // Enlazar eventos de PageFlip antes de cargar
     this.pageFlip.on('init', (e) => {
       this._isInitializing = false;
       this.currentOrientation = e.data.mode;
@@ -141,6 +138,12 @@ export class FlipbookEngine {
       this.currentOrientation = e.data;
       this._syncState();
     });
+
+    // Cargar páginas de imagen
+    this.pageFlip.loadFromImages(this.pages);
+
+    // Sincronizar estado inicial de portada cerrada de inmediato
+    this._syncState();
 
     // Observar redimensionamiento del viewport
     if (!this.resizeObserver) {
@@ -228,6 +231,8 @@ export class FlipbookEngine {
 
     // Sincronizar clases de estado cerrado (portada/contraportada) en contenedor y stage
     const stageWrapper = document.getElementById('flipbook-stage-wrapper');
+    const bookElement = document.getElementById('flipbook-canvas-target');
+
     if (this.container) {
       this.container.classList.remove('is-cover', 'is-back-cover', 'is-open');
       if (stageWrapper) {
@@ -238,15 +243,19 @@ export class FlipbookEngine {
         if (isFirst) {
           this.container.classList.add('is-cover');
           if (stageWrapper) stageWrapper.classList.add('stage-cover');
+          if (bookElement) bookElement.style.transform = 'translate3d(-25%, 0, 0)';
         } else if (isLast) {
           this.container.classList.add('is-back-cover');
           if (stageWrapper) stageWrapper.classList.add('stage-back-cover');
+          if (bookElement) bookElement.style.transform = 'translate3d(25%, 0, 0)';
         } else {
           this.container.classList.add('is-open');
           if (stageWrapper) stageWrapper.classList.add('stage-open');
+          if (bookElement) bookElement.style.transform = 'translate3d(0, 0, 0)';
         }
       } else {
         if (stageWrapper) stageWrapper.classList.add('stage-open');
+        if (bookElement) bookElement.style.transform = 'translate3d(0, 0, 0)';
       }
     }
 
