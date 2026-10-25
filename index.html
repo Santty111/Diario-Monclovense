@@ -22,11 +22,11 @@
   <meta name="theme-color" content="#0a0b0e" />
 
   <!-- Hojas de Estilo Modulares con Cache-Busting -->
-  <link rel="stylesheet" href="css/main.css?v=3.8.2" />
-  <link rel="stylesheet" href="css/flipbook.css?v=3.8.2" />
-  <link rel="stylesheet" href="css/toolbar.css?v=3.8.2" />
-  <link rel="stylesheet" href="css/manager.css?v=3.8.2" />
-  <link rel="stylesheet" href="css/zoom.css?v=3.8.2" />
+  <link rel="stylesheet" href="css/main.css?v=3.9.0" />
+  <link rel="stylesheet" href="css/flipbook.css?v=3.9.0" />
+  <link rel="stylesheet" href="css/toolbar.css?v=3.9.0" />
+  <link rel="stylesheet" href="css/manager.css?v=3.9.0" />
+  <link rel="stylesheet" href="css/zoom.css?v=3.9.0" />
 
   <!-- Favicon SVG en Data URI -->
   <link rel="icon" type="image/svg+xml"
@@ -54,20 +54,38 @@
           <button class="segmented-btn" id="btn-view-single" title="Vista de Página Simple">Simple</button>
         </div>
 
+        <!-- Control de Música de Fondo (Minecraft - Blind Spots) -->
+        <button class="header-btn" id="btn-toggle-bgm" title="Música ambiente: C418 - Blind Spots (B)"
+          aria-label="Música de fondo ambient">
+          <span class="icon">🎵</span>
+        </button>
+
         <!-- Control de Audio con Slider Desplegable -->
         <div class="audio-control-group">
-          <button class="header-btn" id="btn-toggle-mute" title="Silenciar / Activar sonido (M)"
-            aria-label="Control de sonido">
+          <button class="header-btn" id="btn-toggle-mute" title="Efectos de sonido de página (M)"
+            aria-label="Control de sonido de página">
             <span class="icon">🔊</span>
           </button>
           <div class="volume-slider-popup glass-panel">
-            <span style="font-size:0.75rem; color:var(--text-muted)">Vol:</span>
-            <input type="range" class="volume-slider" id="audio-volume-slider" min="0" max="100" value="85"
-              aria-label="Volumen de sonido" />
-            <button class="header-btn" id="btn-test-sound" title="Probar sonido de página"
-              style="padding:0.2rem 0.55rem; font-size:0.72rem; height:26px; border-radius:var(--radius-sm); border-color:rgba(255,255,255,0.25);">
-              Probar
-            </button>
+            <div class="audio-popup-row">
+              <span class="audio-popup-label">📖 Páginas:</span>
+              <input type="range" class="volume-slider" id="audio-volume-slider" min="0" max="100" value="85"
+                aria-label="Volumen de paso de página" />
+              <button class="header-btn" id="btn-test-sound" title="Probar sonido de página"
+                style="padding:0.2rem 0.55rem; font-size:0.72rem; height:24px; border-radius:var(--radius-sm); border-color:rgba(255,255,255,0.25);">
+                Probar
+              </button>
+            </div>
+            <div class="audio-popup-divider"></div>
+            <div class="audio-popup-row">
+              <span class="audio-popup-label">🎵 Blind Spots:</span>
+              <input type="range" class="volume-slider" id="bgm-volume-slider" min="0" max="100" value="16"
+                aria-label="Volumen música ambiente" />
+              <button class="header-btn" id="btn-popup-toggle-bgm" title="Pausar / Reanudar música"
+                style="padding:0.2rem 0.5rem; font-size:0.72rem; height:24px; border-radius:var(--radius-sm); border-color:rgba(255,255,255,0.25);">
+                ⏸
+              </button>
+            </div>
           </div>
         </div>
 
@@ -320,6 +338,10 @@
                 <td style="padding: 0.6rem 0; color: var(--text-main);">Silenciar / Activar sonido de papel</td>
               </tr>
               <tr style="border-bottom: 1px solid var(--border-glass);">
+                <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">B</td>
+                <td style="padding: 0.6rem 0; color: var(--text-main);">Pausar / Reanudar música (Blind Spots)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-glass);">
                 <td style="padding: 0.6rem 0; color: var(--gold-light); font-weight: 600;">F</td>
                 <td style="padding: 0.6rem 0; color: var(--text-main);">Alternar Pantalla Completa</td>
               </tr>
@@ -340,11 +362,11 @@
   </div>
 
   <!-- Librerías de Terceros Vendoreadas Localmente (Cero fallos de red) -->
-  <script src="vendor/page-flip.browser.js?v=3.8.2"></script>
-  <script src="vendor/pdf.min.js?v=3.8.2"></script>
+  <script src="vendor/page-flip.browser.js?v=3.9.0"></script>
+  <script src="vendor/pdf.min.js?v=3.9.0"></script>
 
   <!-- Script Modular Principal -->
-  <script type="module" src="js/app.js?v=3.8.2"></script>
+  <script type="module" src="js/app.js?v=3.9.0"></script>
 </body>
 
 </html>

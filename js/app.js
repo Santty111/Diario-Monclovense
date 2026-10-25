@@ -2,11 +2,11 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.8.2';
-import { PageManager } from './page-manager.js?v=3.8.2';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.8.2';
-import { ZoomController } from './zoom-controller.js?v=3.8.2';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.8.2';
+import { AudioFX } from './audio-fx.js?v=3.9.0';
+import { PageManager } from './page-manager.js?v=3.9.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=3.9.0';
+import { ZoomController } from './zoom-controller.js?v=3.9.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=3.9.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -178,6 +178,36 @@ class LuminaFlipApp {
         this.audioFX.playPageTurn({ force: true });
       });
     }
+
+    // 3b. Música de Fondo Ambiental (C418 - Blind Spots de Minecraft)
+    const btnToggleBgm = document.getElementById('btn-toggle-bgm');
+    const btnPopupBgm = document.getElementById('btn-popup-toggle-bgm');
+    const bgmSlider = document.getElementById('bgm-volume-slider');
+
+    const handleToggleBgm = () => {
+      const isPlaying = this.audioFX.toggleBgm();
+      this._updateBgmUI(isPlaying);
+    };
+
+    btnToggleBgm?.addEventListener('click', handleToggleBgm);
+    btnPopupBgm?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleToggleBgm();
+    });
+
+    if (bgmSlider) {
+      bgmSlider.value = Math.round(this.audioFX.bgmVolume * 100);
+      bgmSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) / 100;
+        this.audioFX.setBgmVolume(val);
+        if (!this.audioFX.isBgmPlaying && val > 0) {
+          this.audioFX.resumeBgm();
+          this._updateBgmUI(true);
+        }
+      });
+    }
+
+    this._updateBgmUI(this.audioFX.isBgmPlaying);
 
     // 4. Modos de vista (Auto / Doble Página / Página Simple)
     document.getElementById('btn-view-auto')?.addEventListener('click', () => {
@@ -591,10 +621,29 @@ class LuminaFlipApp {
     const muteBtn = document.getElementById('btn-toggle-mute');
     if (!muteBtn) return;
     muteBtn.classList.toggle('muted', isMuted);
-    muteBtn.setAttribute('title', isMuted ? 'Activar sonido de pasar página (M)' : 'Silenciar sonido (M)');
+    muteBtn.setAttribute('title', isMuted ? 'Activar sonido de pasar página (M)' : 'Silenciar sonido de páginas (M)');
     const icon = muteBtn.querySelector('.icon');
     if (icon) {
       icon.textContent = isMuted ? '🔇' : '🔊';
+    }
+  }
+
+  _updateBgmUI(isPlaying) {
+    const btnToggleBgm = document.getElementById('btn-toggle-bgm');
+    const btnPopupBgm = document.getElementById('btn-popup-toggle-bgm');
+    if (btnToggleBgm) {
+      btnToggleBgm.classList.toggle('playing', isPlaying);
+      btnToggleBgm.setAttribute('title', isPlaying 
+        ? 'Música de fondo: Blind Spots (C418) [Sonando sutilmente - Clic para pausar (B)]' 
+        : 'Música de fondo: Blind Spots (C418) [Pausada - Clic para reanudar (B)]');
+      const icon = btnToggleBgm.querySelector('.icon');
+      if (icon) {
+        icon.textContent = isPlaying ? '🎵' : '🔇';
+      }
+    }
+    if (btnPopupBgm) {
+      btnPopupBgm.textContent = isPlaying ? '⏸' : '▶';
+      btnPopupBgm.setAttribute('title', isPlaying ? 'Pausar música ambiental' : 'Reanudar música ambiental');
     }
   }
 
@@ -679,6 +728,12 @@ class LuminaFlipApp {
         case 'M':
           e.preventDefault();
           document.getElementById('btn-toggle-mute')?.click();
+          break;
+
+        case 'b':
+        case 'B':
+          e.preventDefault();
+          document.getElementById('btn-toggle-bgm')?.click();
           break;
 
         case 'f':

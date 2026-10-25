@@ -145,19 +145,41 @@
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   border-radius: var(--radius-md);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.65rem;
-  min-width: 220px;
+  min-width: 270px;
   z-index: 120;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
   transition: opacity var(--duration-fast) var(--ease-smooth),
               transform var(--duration-fast) var(--ease-smooth);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.audio-popup-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.audio-popup-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.audio-popup-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.05rem 0;
 }
 
 /* Puente invisible que une el botón con el popup para que el cursor nunca pierda el hover */
@@ -178,6 +200,30 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+}
+
+/* Botón de Música de Fondo (Blind Spots) con pulso suave cuando está activo */
+#btn-toggle-bgm.playing {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+}
+
+#btn-toggle-bgm.playing .icon {
+  display: inline-block;
+  animation: pulse-music 3.5s infinite ease-in-out;
+}
+
+@keyframes pulse-music {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
 }
 
 .volume-slider {

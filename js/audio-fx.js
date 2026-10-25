@@ -47,7 +47,7 @@ export class AudioFX {
       }
     } catch (e) {}
 
-    // 3. Preferencias de volumen
+    // 3. Preferencias de volumen de efectos de página
     try {
       localStorage.removeItem("monflip_muted");
       localStorage.removeItem("lumina_flip_muted");
@@ -57,9 +57,113 @@ export class AudioFX {
       }
     } catch (e) {}
 
-    // 4. Pre-instanciar AudioContext, compresor y decodificar AudioBuffer
+    // 4. Música de Fondo Ambiental (C418 - Blind Spots de Minecraft)
+    this.bgmAudio = null;
+    this.bgmVolume = 0.16; // 16%: sutil y ambiental, no invasivo
+    this.isBgmPlaying = false;
+    this.isBgmMuted = false;
+    this._bgmStartedOnce = false;
+    this._bgmFadeInterval = null;
+    this._initBgm();
+
+    // 5. Pre-instanciar AudioContext, compresor y decodificar AudioBuffer
     this._predecode();
     this._initFetchBackup();
+  }
+
+  _initBgm() {
+    try {
+      this.bgmAudio = new Audio('assets/audio/blind-spots.mp3');
+      this.bgmAudio.loop = true;
+      this.bgmAudio.preload = 'auto';
+      this.bgmAudio.volume = 0; // Inicia en 0 para fade-in sedoso
+
+      const savedBgmVol = localStorage.getItem('monflip_bgm_volume');
+      if (savedBgmVol !== null) {
+        this.bgmVolume = Math.max(0.02, Math.min(1.0, parseFloat(savedBgmVol)));
+      }
+      const savedBgmMute = localStorage.getItem('monflip_bgm_muted');
+      if (savedBgmMute !== null) {
+        this.isBgmMuted = (savedBgmMute === 'true');
+      }
+    } catch (e) {
+      console.warn('No se pudo inicializar música de fondo:', e);
+    }
+  }
+
+  /**
+   * Inicia la música de fondo con un fade-in sutil y envolvente
+   */
+  startBgm() {
+    if (this.isBgmMuted || !this.bgmAudio) return;
+    if (this.isBgmPlaying) return;
+
+    this.isBgmPlaying = true;
+    this.bgmAudio.volume = 0;
+    const playPromise = this.bgmAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        this._fadeInBgm(this.bgmVolume, 2500);
+      }).catch((err) => {
+        // Se desbloqueará en el siguiente gesto del usuario
+        this.isBgmPlaying = false;
+      });
+    }
+  }
+
+  _fadeInBgm(targetVol, durationMs = 2500) {
+    if (!this.bgmAudio) return;
+    clearInterval(this._bgmFadeInterval);
+    const steps = 30;
+    const stepTime = durationMs / steps;
+    const increment = targetVol / steps;
+    let current = 0;
+
+    this._bgmFadeInterval = setInterval(() => {
+      current = Math.min(targetVol, current + increment);
+      if (this.bgmAudio && this.isBgmPlaying) {
+        this.bgmAudio.volume = current;
+      }
+      if (current >= targetVol) {
+        clearInterval(this._bgmFadeInterval);
+      }
+    }, stepTime);
+  }
+
+  pauseBgm() {
+    if (!this.bgmAudio) return;
+    clearInterval(this._bgmFadeInterval);
+    this.isBgmPlaying = false;
+    this.bgmAudio.pause();
+  }
+
+  resumeBgm() {
+    if (!this.bgmAudio) return;
+    this.isBgmMuted = false;
+    try { localStorage.setItem('monflip_bgm_muted', 'false'); } catch (e) {}
+    this.startBgm();
+  }
+
+  toggleBgm() {
+    if (this.isBgmPlaying) {
+      this.pauseBgm();
+      this.isBgmMuted = true;
+      try { localStorage.setItem('monflip_bgm_muted', 'true'); } catch (e) {}
+      return false;
+    } else {
+      this.resumeBgm();
+      return true;
+    }
+  }
+
+  setBgmVolume(val) {
+    this.bgmVolume = Math.max(0.01, Math.min(1.0, val));
+    if (this.bgmAudio && this.isBgmPlaying) {
+      this.bgmAudio.volume = this.bgmVolume;
+    }
+    try {
+      localStorage.setItem('monflip_bgm_volume', this.bgmVolume.toString());
+    } catch (e) {}
   }
 
   _predecode() {
@@ -171,6 +275,12 @@ export class AudioFX {
             node.start(0);
             this._unlockedOnce = true;
           } catch (e) {}
+        }
+
+        // Iniciar música de fondo al primer gesto si no está muteada
+        if (!this._bgmStartedOnce && !this.isBgmMuted) {
+          this._bgmStartedOnce = true;
+          this.startBgm();
         }
       }
     } catch (e) {
