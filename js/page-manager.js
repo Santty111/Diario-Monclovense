@@ -76,9 +76,10 @@ export class PageManager {
    */
   addCustomPage(pageData) {
     const page = {
-      id: 'page_' + Math.random().toString(36).substring(2, 9),
+      id: pageData.id || 'page_' + Math.random().toString(36).substring(2, 9),
       name: pageData.name || `Página ${this.pages.length + 1}`,
       url: pageData.url,
+      blob: pageData.blob || null,
       width: pageData.width || 1200,
       height: pageData.height || 1600,
       rotation: pageData.rotation || 0,
@@ -141,6 +142,7 @@ export class PageManager {
       id: 'page_' + Math.random().toString(36).substring(2, 9),
       name: file.name,
       url: url,
+      blob: blob,
       width: targetWidth,
       height: targetHeight,
       rotation: 0,
@@ -207,6 +209,7 @@ export class PageManager {
         id: 'page_' + Math.random().toString(36).substring(2, 9),
         name: `${file.name} - Pág. ${pageNum}`,
         url: url,
+        blob: blob,
         width: viewport.width,
         height: viewport.height,
         rotation: 0,

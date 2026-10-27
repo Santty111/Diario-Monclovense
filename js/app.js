@@ -2,16 +2,19 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=3.9.0';
-import { PageManager } from './page-manager.js?v=3.9.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=3.9.0';
-import { ZoomController } from './zoom-controller.js?v=3.9.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=3.9.0';
+import { AudioFX } from './audio-fx.js?v=4.0.0';
+import { PageManager } from './page-manager.js?v=4.0.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=4.0.0';
+import { ZoomController } from './zoom-controller.js?v=4.0.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=4.0.0';
+import { StorageManager } from './storage.js?v=4.0.0';
 
 class LuminaFlipApp {
   constructor() {
     this.audioFX = new AudioFX();
     this.pageManager = new PageManager();
+    this.storage = new StorageManager();
+    this._toastTimer = null;
     this.flipbook = null;
     this.zoomController = null;
 
@@ -27,7 +30,7 @@ class LuminaFlipApp {
     this._initZoom();
     this._bindUI();
     this._bindKeyboard();
-    this._loadInitialBook();
+    await this._loadInitialBook();
   }
 
   _initFlipbook() {
@@ -54,8 +57,21 @@ class LuminaFlipApp {
     });
   }
 
-  _loadInitialBook() {
-    // Inicializar el PageManager con las páginas de muestra
+  async _loadInitialBook() {
+    try {
+      const savedPages = await this.storage.getCustomBook();
+      if (savedPages && savedPages.length > 0) {
+        this.pageManager.setPages(savedPages);
+        await this.flipbook.loadBook(this.pageManager.getPages());
+        this._renderFilmstrip();
+        this._showToast(`📖 Se cargaron ${savedPages.length} páginas de tu libro guardado`);
+        return;
+      }
+    } catch (e) {
+      console.warn("No se pudo restaurar el libro guardado:", e);
+    }
+
+    // Inicializar el PageManager con las páginas de muestra si no hay guardadas
     SAMPLE_PAGES.forEach(p => {
       this.pageManager.addCustomPage({
         name: p.name,
@@ -66,8 +82,32 @@ class LuminaFlipApp {
       });
     });
 
-    this.flipbook.loadBook(this.pageManager.getPages());
+    await this.flipbook.loadBook(this.pageManager.getPages());
     this._renderFilmstrip();
+  }
+
+  _showToast(message, duration = 3500) {
+    let toast = document.getElementById("monflip-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "monflip-toast";
+      toast.className = "monflip-toast";
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = message;
+    toast.classList.add("show");
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, duration);
+  }
+
+  async _saveIfCustom() {
+    try {
+      await this.storage.saveCustomBook(this.pageManager.getPages());
+    } catch (e) {
+      console.warn("Error al auto-guardar en IndexedDB:", e);
+    }
   }
 
   _onPageUpdated(info) {
@@ -342,37 +382,65 @@ class LuminaFlipApp {
       this._renderManagerGrid();
     });
 
-    document.getElementById('btn-clear-all-pages')?.addEventListener('click', () => {
+    document.getElementById('btn-clear-all-pages')?.addEventListener('click', async () => {
       if (confirm('¿Seguro que deseas eliminar todas las páginas del libro?')) {
+        await this.storage.clearCustomBook();
         this.pageManager.clear();
         this._renderManagerGrid();
+        this._showToast('🗑️ Todas las páginas han sido eliminadas.');
       }
     });
 
-    document.getElementById('btn-load-sample-book')?.addEventListener('click', () => {
-      this.pageManager.clear();
-      SAMPLE_PAGES.forEach(p => {
-        this.pageManager.addCustomPage({
-          name: p.name,
-          url: p.url,
-          width: p.width,
-          height: p.height,
-          rotation: 0
+    document.getElementById('btn-load-sample-book')?.addEventListener('click', async () => {
+      if (confirm('¿Restablecer el libro histórico de muestra original? Se borrarán las páginas guardadas.')) {
+        await this.storage.clearCustomBook();
+        this.pageManager.clear();
+        SAMPLE_PAGES.forEach(p => {
+          this.pageManager.addCustomPage({
+            name: p.name,
+            url: p.url,
+            width: p.width,
+            height: p.height,
+            rotation: 0
+          });
         });
-      });
-      this._renderManagerGrid();
+        this._renderManagerGrid();
+        this._showToast('🏛️ Se restableció el libro de muestra original.');
+      }
     });
 
     // Botón "Generar y Aplicar Flipbook"
-    document.getElementById('btn-apply-manager')?.addEventListener('click', () => {
+    document.getElementById('btn-apply-manager')?.addEventListener('click', async () => {
       const currentPages = this.pageManager.getPages();
       if (currentPages.length === 0) {
         alert('Agrega al menos una página antes de generar el libro.');
         return;
       }
-      this.flipbook.loadBook(currentPages);
-      this._renderFilmstrip();
-      managerModal?.classList.add('hidden');
+
+      const applyBtn = document.getElementById('btn-apply-manager');
+      const originalText = applyBtn ? applyBtn.innerHTML : '';
+      if (applyBtn) {
+        applyBtn.innerHTML = '<span>💾 Guardando libro...</span>';
+        applyBtn.disabled = true;
+      }
+
+      try {
+        await this.storage.saveCustomBook(currentPages);
+        await this.flipbook.loadBook(currentPages);
+        this._renderFilmstrip();
+        managerModal?.classList.add('hidden');
+        this._showToast(`✓ ¡Libro guardado! Tus ${currentPages.length} páginas persistirán al refrescar.`);
+      } catch (err) {
+        console.error('Error al guardar en almacenamiento local:', err);
+        await this.flipbook.loadBook(currentPages);
+        this._renderFilmstrip();
+        managerModal?.classList.add('hidden');
+      } finally {
+        if (applyBtn) {
+          applyBtn.innerHTML = originalText;
+          applyBtn.disabled = false;
+        }
+      }
     });
 
     // Control de compresión del cliente
@@ -409,6 +477,8 @@ class LuminaFlipApp {
         if (progressBar) progressBar.style.width = `${pct}%`;
         if (progressStatus) progressStatus.textContent = `Procesando ${curr}/${total}: ${name}`;
       });
+      await this.storage.saveCustomBook(this.pageManager.getPages());
+      this._showToast(`📥 ${files.length} archivo(s) procesados y guardados`);
     } catch (err) {
       console.error('Error al procesar lote:', err);
       alert('Ocurrió un error al procesar algunos archivos.');
@@ -478,6 +548,7 @@ class LuminaFlipApp {
             this.pageManager.removePage(index);
           }
           this._renderManagerGrid();
+          this._saveIfCustom();
         });
       });
 
@@ -507,6 +578,7 @@ class LuminaFlipApp {
         if (!isNaN(fromIdx) && fromIdx !== index) {
           this.pageManager.movePage(fromIdx, index);
           this._renderManagerGrid();
+          this._saveIfCustom();
         }
       });
 
