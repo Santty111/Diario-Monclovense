@@ -60,6 +60,7 @@
 .stf__wrapper,
 .stf__canvas {
   border-radius: 10px;
+  background: transparent !important;
 }
 
 /* Centrado suave de libro cerrado: portada sola a la derecha se centra en la vista */

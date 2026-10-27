@@ -2,12 +2,12 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=4.2.0';
-import { PageManager } from './page-manager.js?v=4.2.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=4.2.0';
-import { ZoomController } from './zoom-controller.js?v=4.2.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=4.2.0';
-import { StorageManager } from './storage.js?v=4.2.0';
+import { AudioFX } from './audio-fx.js?v=4.3.0';
+import { PageManager } from './page-manager.js?v=4.3.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=4.3.0';
+import { ZoomController } from './zoom-controller.js?v=4.3.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=4.3.0';
+import { StorageManager } from './storage.js?v=4.3.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -58,7 +58,7 @@ class LuminaFlipApp {
   }
 
   async _loadInitialBook() {
-    const OFFICIAL_BOOK_VERSION = 'v4.2.0-monclovense';
+    const OFFICIAL_BOOK_VERSION = 'v4.3.0-crop';
     const currentVersion = localStorage.getItem('monflip_book_version');
 
     if (currentVersion !== OFFICIAL_BOOK_VERSION) {

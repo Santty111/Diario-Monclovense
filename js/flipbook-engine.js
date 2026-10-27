@@ -175,9 +175,14 @@ export class FlipbookEngine {
     const isPortrait = cWidth < 768 || cWidth < cHeight * 1.15;
     const isSinglePage = this.viewMode === 'single' || (this.viewMode === 'auto' && isPortrait);
 
-    // Relación de aspecto dinámica calculada a partir del documento real cargado
-    let pageAspect = 0.7467;
-    if (this.pageMetadata && this.pageMetadata[0]) {
+    // Relación de aspecto calculada a partir de las páginas interiores del cuaderno para evitar bordes blancos
+    let pageAspect = 0.595;
+    if (this.pageMetadata && this.pageMetadata.length > 1) {
+      const p = this.pageMetadata[1];
+      if (p.width && p.height && p.width > 0 && p.height > 0) {
+        pageAspect = p.width / p.height;
+      }
+    } else if (this.pageMetadata && this.pageMetadata[0]) {
       const p = this.pageMetadata[0];
       if (p.width && p.height && p.width > 0 && p.height > 0) {
         pageAspect = p.width / p.height;
