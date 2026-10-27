@@ -22,11 +22,11 @@
   <meta name="theme-color" content="#0a0b0e" />
 
   <!-- Hojas de Estilo Modulares con Cache-Busting -->
-  <link rel="stylesheet" href="css/main.css?v=4.0.0" />
-  <link rel="stylesheet" href="css/flipbook.css?v=4.0.0" />
-  <link rel="stylesheet" href="css/toolbar.css?v=4.0.0" />
-  <link rel="stylesheet" href="css/manager.css?v=4.0.0" />
-  <link rel="stylesheet" href="css/zoom.css?v=4.0.0" />
+  <link rel="stylesheet" href="css/main.css?v=4.1.0" />
+  <link rel="stylesheet" href="css/flipbook.css?v=4.1.0" />
+  <link rel="stylesheet" href="css/toolbar.css?v=4.1.0" />
+  <link rel="stylesheet" href="css/manager.css?v=4.1.0" />
+  <link rel="stylesheet" href="css/zoom.css?v=4.1.0" />
 
   <!-- Favicon SVG en Data URI -->
   <link rel="icon" type="image/svg+xml"
@@ -299,8 +299,11 @@
             onclick="document.getElementById('page-manager-modal').classList.add('hidden')">
             Cancelar
           </button>
-          <button class="header-btn primary" id="btn-apply-manager">
-            <span>✨ Aplicar y Generar Flipbook</span>
+          <button class="header-btn" id="btn-apply-manager" title="Aplicar cambios de inmediato en este navegador">
+            <span>✨ Aplicar en este navegador</span>
+          </button>
+          <button class="header-btn publish-btn" id="btn-publish-global" title="Guardar como el libro permanente para todos los visitantes, celulares y navegadores">
+            <span>🌐 Guardar y Publicar en Vercel (Para todos)</span>
           </button>
         </div>
       </div>
@@ -362,11 +365,11 @@
   </div>
 
   <!-- Librerías de Terceros Vendoreadas Localmente (Cero fallos de red) -->
-  <script src="vendor/page-flip.browser.js?v=4.0.0"></script>
-  <script src="vendor/pdf.min.js?v=4.0.0"></script>
+  <script src="vendor/page-flip.browser.js?v=4.1.0"></script>
+  <script src="vendor/pdf.min.js?v=4.1.0"></script>
 
   <!-- Script Modular Principal -->
-  <script type="module" src="js/app.js?v=4.0.0"></script>
+  <script type="module" src="js/app.js?v=4.1.0"></script>
 </body>
 
 </html>

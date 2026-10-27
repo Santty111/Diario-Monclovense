@@ -2,12 +2,12 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=4.0.0';
-import { PageManager } from './page-manager.js?v=4.0.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=4.0.0';
-import { ZoomController } from './zoom-controller.js?v=4.0.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=4.0.0';
-import { StorageManager } from './storage.js?v=4.0.0';
+import { AudioFX } from './audio-fx.js?v=4.1.0';
+import { PageManager } from './page-manager.js?v=4.1.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=4.1.0';
+import { ZoomController } from './zoom-controller.js?v=4.1.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=4.1.0';
+import { StorageManager } from './storage.js?v=4.1.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -439,6 +439,94 @@ class LuminaFlipApp {
         if (applyBtn) {
           applyBtn.innerHTML = originalText;
           applyBtn.disabled = false;
+        }
+      }
+    });
+
+
+    // Botón "Guardar y Publicar en Vercel (Para todos los navegadores)"
+    document.getElementById('btn-publish-global')?.addEventListener('click', async () => {
+      const currentPages = this.pageManager.getPages();
+      if (currentPages.length === 0) {
+        alert('Agrega al menos una página antes de publicar.');
+        return;
+      }
+
+      if (!confirm('¿Deseas guardar estas páginas como el libro oficial y permanente del sitio web?\n\nSe sincronizará con GitHub y Vercel para que cualquier persona en cualquier celular, computadora o navegador las vea.')) {
+        return;
+      }
+
+      const publishBtn = document.getElementById('btn-publish-global');
+      const originalText = publishBtn ? publishBtn.innerHTML : '';
+      if (publishBtn) {
+        publishBtn.innerHTML = '<span>⏳ Guardando y subiendo a Vercel...</span>';
+        publishBtn.disabled = true;
+      }
+
+      try {
+        this._showToast('📤 Preparando páginas para sincronización con el servidor...');
+        const payloadPages = [];
+
+        for (let i = 0; i < currentPages.length; i++) {
+          const p = currentPages[i];
+          let blob = p.blob;
+          if (!blob && p.url) {
+            try {
+              const resp = await fetch(p.url);
+              blob = await resp.blob();
+            } catch (e) {
+              console.warn('No se pudo convertir a blob:', p.url, e);
+            }
+          }
+
+          if (blob) {
+            const base64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+
+            payloadPages.push({
+              name: p.name || `Página ${i + 1}`,
+              dataUrl: base64,
+              width: p.width || 1200,
+              height: p.height || 1600,
+              rotation: p.rotation || 0
+            });
+          }
+        }
+
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (!isLocal) {
+          alert('Para publicar cambios globales en GitHub y Vercel con 1 clic, abre tu servidor local en http://localhost:3000 y presiona este botón.');
+          return;
+        }
+
+        const response = await fetch('/api/publish-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pages: payloadPages })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          await this.storage.clearCustomBook();
+          await this.flipbook.loadBook(currentPages);
+          this._renderFilmstrip();
+          managerModal?.classList.add('hidden');
+          this._showToast('🚀 ¡Publicado con éxito! Visible en cualquier navegador en ~20 seg.');
+          alert('¡Éxito! Tus páginas se han guardado en el servidor oficial y se subieron a GitHub. En unos 20-30 segundos Vercel terminará el despliegue automático y ya será visible en cualquier navegador o celular.');
+        } else {
+          throw new Error(result.error || 'Error al procesar en servidor');
+        }
+      } catch (err) {
+        console.error('Error al publicar libro global:', err);
+        alert('Hubo un error al publicar: ' + err.message);
+      } finally {
+        if (publishBtn) {
+          publishBtn.innerHTML = originalText;
+          publishBtn.disabled = false;
         }
       }
     });

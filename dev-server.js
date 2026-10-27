@@ -6,6 +6,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +47,87 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   }
+
+  if (req.method === "POST" && reqPath === "/api/publish-book") {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => {
+      try {
+        const bodyBuffer = Buffer.concat(chunks);
+        const { pages } = JSON.parse(bodyBuffer.toString("utf8"));
+
+        if (!pages || !Array.isArray(pages) || pages.length === 0) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "No se enviaron páginas válidas" }));
+          return;
+        }
+
+        const outDir = path.join(__dirname, "assets", "monclovense");
+        if (!fs.existsSync(outDir)) {
+          fs.mkdirSync(outDir, { recursive: true });
+        }
+
+        // Limpiar archivos anteriores en assets/monclovense
+        const existingFiles = fs.readdirSync(outDir);
+        for (const file of existingFiles) {
+          if (/\.(jpe?g|png|webp)$/i.test(file)) {
+            try { fs.unlinkSync(path.join(outDir, file)); } catch (e) {}
+          }
+        }
+
+        const bookEntries = [];
+
+        pages.forEach((p, idx) => {
+          const pageNum = String(idx + 1).padStart(2, "0");
+          const fileName = `page-${pageNum}.jpg`;
+          const filePath = path.join(outDir, fileName);
+
+          const base64Data = p.dataUrl.replace(/^data:image\/\w+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          fs.writeFileSync(filePath, buffer);
+
+          bookEntries.push({
+            name: p.name || `Página ${idx + 1}`,
+            url: `assets/monclovense/${fileName}`,
+            width: p.width || 1200,
+            height: p.height || 1600,
+            rotation: p.rotation || 0,
+            description: `Página ${idx + 1} de Diario Monclovense`
+          });
+        });
+
+        // Actualizar js/sample-book.js
+        const sampleBookContent = `/**
+ * Colección oficial de páginas de Diario Monclovense
+ * Generada automáticamente para que persista y sea visible globalmente en cualquier navegador.
+ */
+export const SAMPLE_PAGES = ${JSON.stringify(bookEntries, null, 2)};
+`;
+        fs.writeFileSync(path.join(__dirname, "js", "sample-book.js"), sampleBookContent, "utf8");
+
+        // Ejecutar git commit y push
+        let gitSuccess = false;
+        try {
+          execSync("git add assets/monclovense/ js/sample-book.js", { cwd: __dirname });
+          execSync("git commit -m \"feat(book): publish custom book as global default\" || true", { cwd: __dirname });
+          execSync("git push origin main", { cwd: __dirname });
+          gitSuccess = true;
+          console.log("✓ Libro publicado y subido a GitHub/Vercel exitosamente");
+        } catch (gitErr) {
+          console.error("Aviso en git sync:", gitErr.message);
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, count: bookEntries.length, gitSynced: gitSuccess }));
+      } catch (err) {
+        console.error("Error en /api/publish-book:", err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
 
   const safePath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
   const filePath = path.join(__dirname, safePath);
