@@ -1,54 +1,54 @@
 /**
- * SampleBook - Colección de muestra precargada de manuscrito histórico
- * Permite explorar de inmediato el paso de página interactivo, zoom y efectos sonoros.
+ * Colección oficial de páginas de Diario Monclovense
+ * Generada automáticamente con los manuscritos y portadas oficiales.
  */
 export const SAMPLE_PAGES = [
   {
-    name: 'Portada: De Sphaera Coelestis (1624)',
-    url: 'assets/sample/page-01-cover.jpg',
-    width: 710,
-    height: 990,
-    rotation: 0,
-    description: 'Encuadernación renacentista en cuero labrado con esfera armilar en pan de oro.'
-  },
-  {
-    name: 'Herbarium Medicinalis: Achillea & Salvia',
-    url: 'assets/sample/page-02-botanical.jpg',
+    name: 'Portada: Pasta Dura Roja',
+    url: 'assets/monclovense/page-01-portada.jpg',
     width: 1200,
     height: 1600,
     rotation: 0,
-    description: 'Ilustración botánica con caligrafía latina y detalles anatómicos de hierbas curativas.'
+    description: 'Cubierta exterior encuadernada en pasta dura roja.'
   },
   {
-    name: 'Planispherium Coeleste: Constelaciones Boreales',
-    url: 'assets/sample/page-03-celestial.jpg',
+    name: '19 de octubre, 2026 — Cap I',
+    url: 'assets/monclovense/page-02-pagina1.jpg',
+    width: 1067,
+    height: 1759,
+    rotation: 0,
+    description: 'Escribir es mi manera de querer escupir el alma.'
+  },
+  {
+    name: 'Página 2 — Reflexión y sinceridad',
+    url: 'assets/monclovense/page-03-pagina2.jpg',
+    width: 1049,
+    height: 1744,
+    rotation: 0,
+    description: 'Si un pájaro se enamora de un pez ¿en qué rincón del mundo podrían vivir?'
+  },
+  {
+    name: '25 de octubre, 2026 — Cap II',
+    url: 'assets/monclovense/page-04-pagina3.jpg',
+    width: 1064,
+    height: 1748,
+    rotation: 0,
+    description: 'Pero ella es mi rosa: Pero no es una simple rosa, es tu rosa.'
+  },
+  {
+    name: 'Página 4 — Just for You (QR)',
+    url: 'assets/monclovense/page-05-pagina4.jpg',
+    width: 1040,
+    height: 1730,
+    rotation: 0,
+    description: 'Dedicatoria interactiva con código QR Just For You.'
+  },
+  {
+    name: 'Contraportada: Pasta Dura Roja',
+    url: 'assets/monclovense/page-06-contraportada.jpg',
     width: 1200,
     height: 1600,
     rotation: 0,
-    description: 'Carta celeste astronómica del zodíaco, esferas orbitales y coordenadas celestes.'
-  },
-  {
-    name: 'Tabula Nautica: Carta Marina del Atlántico',
-    url: 'assets/sample/page-04-cartography.jpg',
-    width: 1200,
-    height: 1600,
-    rotation: 0,
-    description: 'Mapa de navegación marítima del siglo XVII con rosa de los vientos y leviatán.'
-  },
-  {
-    name: 'Colofón Archival & Sello Monástico',
-    url: 'assets/sample/page-05-back.jpg',
-    width: 1200,
-    height: 1600,
-    rotation: 0,
-    description: 'Certificación archivística con grabado heráldico y sello de lacre carmesí.'
-  },
-  {
-    name: 'Contraportada: Encuadernación Posterior',
-    url: 'assets/sample/page-06-backcover.jpg',
-    width: 710,
-    height: 990,
-    rotation: 0,
-    description: 'Cubierta posterior en cuero curtido con ornamentos barrocos.'
+    description: 'Cubierta posterior del diario personal.'
   }
 ];

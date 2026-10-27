@@ -2,12 +2,12 @@
  * LuminaFlip - Aplicación Principal
  * Coordinador de UI, motor de Flipbook, Audio FX, Gestor de Páginas y Zoom Panorámico.
  */
-import { AudioFX } from './audio-fx.js?v=4.1.0';
-import { PageManager } from './page-manager.js?v=4.1.0';
-import { FlipbookEngine } from './flipbook-engine.js?v=4.1.0';
-import { ZoomController } from './zoom-controller.js?v=4.1.0';
-import { SAMPLE_PAGES } from './sample-book.js?v=4.1.0';
-import { StorageManager } from './storage.js?v=4.1.0';
+import { AudioFX } from './audio-fx.js?v=4.2.0';
+import { PageManager } from './page-manager.js?v=4.2.0';
+import { FlipbookEngine } from './flipbook-engine.js?v=4.2.0';
+import { ZoomController } from './zoom-controller.js?v=4.2.0';
+import { SAMPLE_PAGES } from './sample-book.js?v=4.2.0';
+import { StorageManager } from './storage.js?v=4.2.0';
 
 class LuminaFlipApp {
   constructor() {
@@ -58,20 +58,31 @@ class LuminaFlipApp {
   }
 
   async _loadInitialBook() {
-    try {
-      const savedPages = await this.storage.getCustomBook();
-      if (savedPages && savedPages.length > 0) {
-        this.pageManager.setPages(savedPages);
-        await this.flipbook.loadBook(this.pageManager.getPages());
-        this._renderFilmstrip();
-        this._showToast(`📖 Se cargaron ${savedPages.length} páginas de tu libro guardado`);
-        return;
+    const OFFICIAL_BOOK_VERSION = 'v4.2.0-monclovense';
+    const currentVersion = localStorage.getItem('monflip_book_version');
+
+    if (currentVersion !== OFFICIAL_BOOK_VERSION) {
+      // Sincronizar automáticamente con la versión oficial recién publicada
+      try {
+        await this.storage.clearCustomBook();
+        localStorage.setItem('monflip_book_version', OFFICIAL_BOOK_VERSION);
+      } catch (e) {}
+    } else {
+      try {
+        const savedPages = await this.storage.getCustomBook();
+        if (savedPages && savedPages.length > 0) {
+          this.pageManager.setPages(savedPages);
+          await this.flipbook.loadBook(this.pageManager.getPages());
+          this._renderFilmstrip();
+          this._showToast(`📖 Se cargaron ${savedPages.length} páginas de tu libro guardado`);
+          return;
+        }
+      } catch (e) {
+        console.warn("No se pudo restaurar el libro guardado:", e);
       }
-    } catch (e) {
-      console.warn("No se pudo restaurar el libro guardado:", e);
     }
 
-    // Inicializar el PageManager con las páginas de muestra si no hay guardadas
+    // Inicializar el PageManager con las páginas oficiales
     SAMPLE_PAGES.forEach(p => {
       this.pageManager.addCustomPage({
         name: p.name,
