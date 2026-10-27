@@ -1,13 +1,11 @@
 {
-  "name": "lumina-flip",
+  "name": "monflip",
   "version": "2.5.0",
-  "description": "Lector interactivo de libros y documentos escaneados con física 3D de paso de página, compresión cliente, audio procedural y zoom de alta precisión",
-  "main": "server.js",
+  "description": "Lector interactivo de libros y documentos escaneados con f\u00edsica 3D de paso de p\u00e1gina, compresi\u00f3n cliente, audio procedural y zoom de alta precisi\u00f3n",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "build": "echo 'Build OK: Static production bundle ready for Vercel CDN deployment'"
+    "start": "node dev-server.js",
+    "dev": "node dev-server.js"
   },
   "keywords": [
     "flipbook",
@@ -19,8 +17,5 @@
     "vercel"
   ],
   "author": "LuminaFlip Senior Engineering",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "license": "MIT"
 }

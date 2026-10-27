@@ -15,4 +15,4 @@ echo "🚀 Iniciando LuminaFlip en http://localhost:3000 ..."
 (sleep 1.2 && open "http://localhost:3000") &
 
 # Ejecutar el servidor web
-node server.js
+node dev-server.js
