@@ -170,13 +170,13 @@ export class FlipbookEngine {
    */
   _calculateDimensions() {
     const cWidth = this.container.clientWidth || window.innerWidth;
-    const cHeight = this.container.clientHeight || (window.innerHeight - 140);
+    const cHeight = this.container.clientHeight || (window.innerHeight - 100);
 
     const isPortrait = cWidth < 768 || cWidth < cHeight * 1.15;
     const isSinglePage = this.viewMode === 'single' || (this.viewMode === 'auto' && isPortrait);
 
-    // Relación de aspecto calculada a partir de las páginas interiores del cuaderno para evitar bordes blancos
-    let pageAspect = 0.595;
+    // Relación de aspecto exacta de las hojas del cuaderno
+    let pageAspect = 0.606;
     if (this.pageMetadata && this.pageMetadata.length > 1) {
       const p = this.pageMetadata[1];
       if (p.width && p.height && p.width > 0 && p.height > 0) {
@@ -192,9 +192,9 @@ export class FlipbookEngine {
     let pageHeight, pageWidth;
 
     if (isSinglePage) {
-      // 1 página: maximizar área visible garantizando que entre 100% entera (contain)
-      const availWidth = Math.floor(cWidth * 0.94);
-      const availHeight = Math.floor(cHeight * 0.94);
+      // En celular / vista simple: maximizar el área visible (98% de ancho) para que se lea grande como en PC
+      const availWidth = Math.floor(cWidth * 0.98);
+      const availHeight = Math.floor(cHeight * 0.98);
 
       if (availWidth / availHeight < pageAspect) {
         pageWidth = availWidth;
@@ -204,7 +204,7 @@ export class FlipbookEngine {
         pageWidth = Math.floor(pageHeight * pageAspect);
       }
     } else {
-      // Vista doble (Spread abierto de 2 páginas lado a lado):
+      // Vista doble (Spread abierto de 2 páginas lado a lado en PC):
       const availWidth = Math.floor(cWidth * 0.96);
       const availHeight = Math.floor(cHeight * 0.94);
 
