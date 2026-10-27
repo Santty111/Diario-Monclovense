@@ -1,6 +1,8 @@
 {
-  "version": 2,
-  "name": "diario-monclovense",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": ".",
+  "buildCommand": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
